@@ -41,7 +41,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f3ead8;font-family:-a
 .row{display:flex;gap:8px;margin-top:8px}
 .row a,.row button{flex:1;text-align:center;border-radius:12px;padding:11px;font-weight:700;font-size:14px;text-decoration:none}
 .pri{background:var(--accent);color:#fff}.sec{background:#efe7d8;color:var(--ink)}
-#inbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 92px);z-index:6;display:none;gap:8px;align-items:center;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:14px;padding:6px 6px 6px 12px;box-shadow:0 2px 12px rgba(0,0,0,.15);font-size:13px;white-space:nowrap}
+#inbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 64px);z-index:6;display:none;gap:8px;align-items:center;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:14px;padding:6px 6px 6px 12px;box-shadow:0 2px 12px rgba(0,0,0,.15);font-size:13px;white-space:nowrap}
 #inbar.show{display:flex}
 #inbar button{background:var(--ink);color:#fff;border-radius:10px;padding:7px 11px;font-weight:700;font-size:12.5px}
 body.cine #inbar{display:none!important}
@@ -53,6 +53,23 @@ body.cine #inbar{display:none!important}
 .seg{display:flex;gap:6px;margin:6px 0 10px}.seg button{flex:1;border-radius:10px;padding:9px;background:#efe7d8;font-weight:700;font-size:13px}.seg button.on{background:var(--ink);color:#fff}
 .ok{color:#2f8a4f;font-weight:700}.nl{list-style:none;padding:0;margin:8px 0}.nl li{padding:8px 0;border-bottom:1px solid #eee3d2;font-size:13.5px}.nl small{color:var(--muted)}
 .adm h3{font-size:13px;margin:12px 0 2px;color:#6b6272;text-transform:uppercase;letter-spacing:.5px}
+#workbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 64px);z-index:6;display:none;gap:8px;align-items:center;background:var(--accent);color:#fff;border-radius:14px;padding:6px 6px 6px 12px;box-shadow:0 2px 12px rgba(0,0,0,.18);font-size:13px;font-weight:700;white-space:nowrap}
+#workbar.show{display:flex}#workbar b{font-variant-numeric:tabular-nums}
+#workbar button{background:#fff;color:var(--ink);border-radius:10px;padding:6px 10px;font-weight:700;font-size:12px}
+body.inroom #workbar{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 112px)}
+#quick{position:fixed;left:10px;right:10px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 60px);z-index:8;display:none;flex-wrap:wrap;gap:6px;max-width:460px;margin:0 auto}
+#quick.show{display:flex}
+#quick button{background:var(--paper);border-radius:11px;padding:9px 12px;font-weight:700;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.14)}
+.mebtn{background:var(--accent);color:#fff;border-radius:9px;padding:3px 9px;font-size:12px;font-weight:700;vertical-align:middle;margin-left:6px}
+.lbl{font-size:12px;font-weight:700;color:var(--muted);margin:8px 0 3px}
+.sw{display:flex;flex-wrap:wrap;gap:7px}
+.sw button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.sw button.on{box-shadow:0 0 0 3px var(--accent)}
+.sw button.t{width:auto;height:30px;border-radius:9px;padding:0 10px;background:#efe7d8;font-size:12.5px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:6px}
+.it{background:#f1ebdf;border-radius:12px;padding:9px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--ink)}
+.it b{display:block;font-size:24px;margin-bottom:2px}.it.own{background:#dff0d8}.it small{color:var(--muted)}
+.coin{background:#ffd56a!important}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(42,34,48,.92);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:80%}
 #toast.show{opacity:1}
 #load{position:fixed;inset:0;background:#f3ead8;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
@@ -74,10 +91,12 @@ body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!imp
   <button class="chip btn" id="regbtn">Bölgeler ▾</button>
   <div id="menu"></div>
 </div>
-<div class="find"><input id="q" placeholder="Sakini bul: @kullanıcıadı" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" id="go">Bul</button></div>
+<div class="find"><input id="q" placeholder="Ara: @kullanıcıadı ya da evime git" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" id="go">Bul</button></div>
 <div id="inbar"><span id="intitle"></span><button class="btn" id="exitbtn">← Dışarı çık</button></div>
 <div id="card"><button class="x btn" id="cx">×</button><div id="cardbody"></div></div>
 <div id="toast"></div>
+<div id="workbar"><span id="worktxt"></span><button class="btn" id="workgo">İzle</button><button class="btn" id="workstop">Bırak</button></div>
+<div id="quick"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -167,6 +186,7 @@ class Bake {
   ico(r, c, x, y, z, sy = 1){ this.add(GEO.ico, c, x, y, z, 0, 0, 0, r, r * sy, r); }
   cyl(rt, rb, h, seg, c, x, y, z, rx = 0, rz = 0, sz = 1){ this.add(cylG(rt, rb, seg), c, x, y, z, rx, 0, rz, 1, h, sz); }
   prism(len, wid, h, c, x, y, z, ry = 0){ this.add(GEO.pr, c, x, y, z, 0, ry, 0, len, h, wid); }
+  geo(){ if (!this.list.length) return null; const g = mergeGeometries(this.list, false); this.list.forEach(x => x.dispose()); this.list = []; return g; }
   build(material, cast, recv){
     if (!this.list.length) return null;
     const g = mergeGeometries(this.list, false); this.list.forEach(x => x.dispose()); this.list = [];
@@ -188,6 +208,43 @@ function label3d(text, x, y, z, bg = '#2a2230', fg = '#fff', size = 1){
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({map: t, depthTest: false, transparent: true}));
   s.scale.set(w / 72 * 1.6 * size, 1.6 * size, 1); s.position.set(x, y, z); s.renderOrder = 10; scene.add(s); return s;
+}
+
+// ---------- dalgalanan Turk bayragi ----------
+const flagTex = (() => {
+  const c = document.createElement('canvas'); c.width = 300; c.height = 200; const x = c.getContext('2d');
+  x.fillStyle = '#e30a17'; x.fillRect(0, 0, 300, 200); x.scale(0.25, 0.25);
+  x.fillStyle = '#fff'; x.beginPath(); x.arc(425, 400, 200, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#e30a17'; x.beginPath(); x.arc(475, 400, 160, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); [[583.334, 400], [764.235, 458.779], [652.431, 304.894], [652.431, 495.106], [764.235, 341.221]].forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+})();
+const flagMat = new THREE.MeshLambertMaterial({map: flagTex, side: THREE.DoubleSide});
+const FLAGS = [];
+function makeFlag(x, yTop, z, w = 2.4, ry = 0){
+  const h = w / 1.5, g = new THREE.PlaneGeometry(w, h, 14, 7); g.translate(w / 2, -h / 2, 0);
+  const m = new THREE.Mesh(g, flagMat); m.position.set(x, yTop, z); m.rotation.y = ry; scene.add(m);
+  const f = {m, base: Float32Array.from(g.attributes.position.array), w, ph: Math.random() * 6}; FLAGS.push(f); return f;
+}
+function removeFlag(f){ scene.remove(f.m); f.m.geometry.dispose(); const i = FLAGS.indexOf(f); if (i >= 0) FLAGS.splice(i, 1); }
+function updateFlags(t){
+  const cp = camera.position;
+  for (const f of FLAGS){
+    if (f.m.position.distanceToSquared(cp) > 200 * 200) continue;
+    const pa = f.m.geometry.attributes.position, a = pa.array, b = f.base, sc2 = f.w / 2.4;
+    for (let i = 0; i < pa.count; i++){ const x = b[i * 3], y = b[i * 3 + 1], k = x / f.w; a[i * 3 + 2] = (Math.sin(x / sc2 * 2.4 - t * 5.2 + f.ph + y * 0.6) * 0.22 + Math.sin(x / sc2 * 4.3 - t * 7.9 + f.ph) * 0.06) * k * sc2; a[i * 3 + 1] = y - k * k * 0.05 * f.w; }
+    pa.needsUpdate = true; f.m.geometry.computeVertexNormals();
+  }
+}
+const clockC = document.createElement('canvas'); clockC.width = clockC.height = 128;
+const clockTex = new THREE.CanvasTexture(clockC); clockTex.colorSpace = THREE.SRGBColorSpace;
+function drawClock(){
+  const x = clockC.getContext('2d'), ist = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Istanbul'}));
+  x.clearRect(0, 0, 128, 128); x.fillStyle = '#fffaf0'; x.beginPath(); x.arc(64, 64, 60, 0, 7); x.fill(); x.lineWidth = 6; x.strokeStyle = '#2a2230'; x.stroke();
+  for (let k = 0; k < 12; k++){ const a = k / 12 * Math.PI * 2; x.beginPath(); x.moveTo(64 + Math.sin(a) * 47, 64 - Math.cos(a) * 47); x.lineTo(64 + Math.sin(a) * 55, 64 - Math.cos(a) * 55); x.lineWidth = k % 3 ? 3 : 6; x.stroke(); }
+  const h = ist.getHours() % 12 + ist.getMinutes() / 60, m = ist.getMinutes();
+  const hand = (a, l, w) => { x.beginPath(); x.moveTo(64, 64); x.lineTo(64 + Math.sin(a) * l, 64 - Math.cos(a) * l); x.lineWidth = w; x.lineCap = 'round'; x.stroke(); };
+  hand(h / 12 * Math.PI * 2, 30, 7); hand(m / 60 * Math.PI * 2, 46, 4); clockTex.needsUpdate = true;
 }
 
 // ---------- parcalar ----------
@@ -262,7 +319,7 @@ function buildHouse(x, z, ry, r, opt = {}){
     windowAt(B, w, d, 1, 0, wy + f * fh, 1.0, 1.0, shut, r); windowAt(B, w, d, 3, 0, wy + f * fh, 1.0, 1.0, shut, r);
     for (const u of [-w * 0.22, w * 0.22]) windowAt(B, w, d, 2, u, wy + f * fh, 1.0, 1.0, 0, r);
   }
-  if (fl > 1 && r() < 0.5){ B.box(w * 0.55, 0.14, 1.0, TRIM, 0, 0.6 + fh + 0.05, d / 2 + 0.5); B.box(w * 0.55, 0.6, 0.06, 0x3a3540, 0, 0.6 + fh + 0.4, d / 2 + 0.98); }
+  if (fl > 1 && r() < 0.5 && !opt.noBalc){ B.box(w * 0.55, 0.14, 1.0, TRIM, 0, 0.6 + fh + 0.05, d / 2 + 0.5); B.box(w * 0.55, 0.6, 0.06, 0x3a3540, 0, 0.6 + fh + 0.4, d / 2 + 0.98); }
   B.reset(); WL.reset(); WD.reset();
   return {w, d, dx};
 }
@@ -284,6 +341,21 @@ function garden(x, z, ry, h, LW, FZ, r){
   for (let i = 0; i < 5; i++){ const u = (r() - .5) * (h.w - 1); if (Math.abs(u - h.dx) < 0.9) continue; B.box(0.2, 0.25, 0.2, pick([0xe24f4f, 0xf4c542, 0xf3a0c0, 0xffffff, 0xb07ad8], r), u, 0.5, h.d / 2 + 0.35 + r() * 0.5); }
   B.reset(); G.reset();
   if (r() < 0.45){ const bx = (r() - .5) * 3, bz = -h.d / 2 - 1.6; const c = Math.cos(ry), sn = Math.sin(ry); tree(S, x + bx * c + bz * sn, z - bx * sn + bz * c, 0.7, r); }
+}
+function founderHouse(L){
+  const r = RNG(77), h = buildHouse(L.x, L.z, L.ry, r, {w: 7.0, d: 6.0, floors: 2, wall: 0xfbf6ea, roof: 0x2f4a6b, door: 0x7a4a2a, doorX: 0, noBalc: true});
+  const B = S; B.frame(L.x, L.z, L.ry); G.frame(L.x, L.z, L.ry);
+  for (const sd of [-1, 1]) B.cyl(0.16, 0.18, 2.7, 10, 0xffffff, sd * 1.0, 0.6 + 1.35, h.d / 2 + 0.9);
+  B.box(2.6, 0.18, 1.5, 0xffffff, 0, 0.6 + 2.75, h.d / 2 + 0.75); B.box(2.4, 0.06, 0.06, 0xd4a63a, 0, 0.6 + 2.9, h.d / 2 + 1.5);
+  for (const sd of [-1, 1]) B.box(0.14, 6.0, 0.14, 0xd4a63a, sd * (h.w / 2 + 0.02), 0.6 + 3.0, h.d / 2 + 0.02);
+  G.box(1.4, 0.05, 2.6, 0xe8e0d0, 0, 0.36, h.d / 2 + 1.6);
+  for (const sd of [-1, 1]){ B.box(LW / 2 - 0.9, 0.7, 0.45, 0x3f7a40, sd * (LW / 4 + 0.45), 0.7, FZ); B.cyl(0.05, 0.07, 1.6, 6, 0x2a2230, sd * 0.95, 1.1, FZ - 0.35); B.box(0.28, 0.32, 0.28, 0xffe3a0, sd * 0.95, 2.0, FZ - 0.35); }
+  B.cyl(0.9, 1.0, 0.45, 14, 0xd8ccb6, -2.5, 0.55, h.d / 2 + 1.5); G.cyl(0.75, 0.75, 0.06, 14, 0x6fc6d0, -2.5, 0.8, h.d / 2 + 1.5); B.cyl(0.12, 0.15, 0.9, 8, 0xd8ccb6, -2.5, 1.0, h.d / 2 + 1.5);
+  for (let k = 0; k < 6; k++) B.box(0.22, 0.25, 0.22, pick([0xe24f4f, 0xf4c542, 0xffffff, 0xb07ad8], r), 1.6 + (k % 3) * 0.45, 0.5, h.d / 2 + 0.9 + Math.floor(k / 3) * 0.5);
+  B.cyl(0.06, 0.08, 6.2, 6, 0xdddddd, 3.2, 3.4, h.d / 2 + 1.9);
+  B.reset(); G.reset();
+  const [fx, fz] = lw(L, 3.2, h.d / 2 + 1.9); makeFlag(fx, 6.45, fz, 1.6, L.ry + Math.PI / 2);
+  return h;
 }
 function apartment(x, z, floors, r){
   const w = 9, d = 9, fh = 2.8, H = floors * fh, wall = pick([0xf1e4cf, 0xf2dfa0, 0xe9b799, 0xf0c4b6, 0xcfd9c0, 0xd9e3e6], r);
@@ -326,19 +398,48 @@ for (let k = 0; k <= N; k++){
   }
   for (let a = 1; a < N; a++) for (let b = 1; b < N; b++){
     const X = -HALF + a * PITCH, Z = -HALF + b * PITCH; if (Math.abs(X) > 70 || Math.abs(Z) > 70) continue;
-    for (let s = -2; s <= 2; s++){ marks.push([X + s * 1.2, Z - 5.2, 1, 0.6, 2.4]); marks.push([X - 5.2, Z + s * 1.2, 0, 0.6, 2.4]); }
+    for (let s = -2; s <= 2; s++) for (const o of [-5.2, 5.2]){ marks.push([X + s * 1.2, Z + o, 1, 0.6, 2.4]); marks.push([X + o, Z + s * 1.2, 0, 0.6, 2.4]); }
   }
   const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshLambertMaterial({color: 0xf1ede2}), marks.length); const o = new THREE.Object3D();
   marks.forEach(([x, z, rr, w, l], i) => { o.position.set(x, 0.135, z); o.rotation.set(-Math.PI / 2, 0, rr ? Math.PI / 2 : 0); o.scale.set(w, l, 1); o.updateMatrix(); im.setMatrixAt(i, o.matrix); });
   im.receiveShadow = true; scene.add(im);
 }
-// park halindeki arabalar
-for (let k = 0; k < 46; k++){
-  const vert = rnd() < 0.5, line = 1 + Math.floor(rnd() * (N - 1)), seg = Math.floor(rnd() * N);
-  const along = blockCenter(seg, seg)[0] + (rnd() - .5) * 16, side = rnd() < .5 ? -1 : 1, pos = -HALF + line * PITCH + side * 2.3;
-  if (vert) car(S, pos, along, side > 0 ? 0 : Math.PI); else car(S, along, pos, side > 0 ? Math.PI / 2 : -Math.PI / 2);
-}
 
+const STATION = {};
+function buildStation(cx, cz){
+  STATION.cx = cx; STATION.cz = cz;
+  const PL = 0xd9cdb6, PT = 1.3, ph = PT - 0.3;
+  const seg = (x0, x1, z0, z1) => S.box(x1 - x0, ph, z1 - z0, PL, cx + (x0 + x1) / 2, 0.3 + ph / 2, cz + (z0 + z1) / 2);
+  seg(-11, 11, -11, -9); seg(-11, 11, -5, 0.9); seg(-11, -7.2, -9, -5); seg(-4.8, 4.8, -9, -5); seg(7.2, 11, -9, -5);
+  for (const [z, f] of [[-12.5, 1 / 3], [-11.9, 2 / 3], [-11.3, 1]]) S.box(8, ph * f, 0.6, PL, cx, 0.3 + ph * f / 2, cz + z);
+  for (const sx of [-6, 6]){
+    for (let k = 0; k < 3; k++){ const top = PT - 0.25 * (k + 1); S.box(2.4, top - 0.3, 1, 0xcfc3ad, cx + sx, 0.3 + (top - 0.3) / 2, cz - 5.5 - k); }
+    S.box(2.4, 0.05, 1, 0x8a8478, cx + sx, 0.32, cz - 8.5);
+    S.pl(2.4, ph, 0x121018, cx + sx, 0.3 + ph / 2, cz - 8.97, 0);
+    for (const s2 of [-1, 1]) S.box(0.08, 0.9, 4.1, 0x3a3540, cx + sx + s2 * 1.25, PT + 0.45, cz - 7);
+    S.box(2.6, 0.08, 0.08, 0x3a3540, cx + sx, PT + 0.9, cz - 9.05);
+    S.box(0.1, 2.4, 0.1, 0x3a3540, cx + sx + 1.6, PT + 1.2, cz - 4.7); S.box(0.9, 0.9, 0.14, 0x2f6fb5, cx + sx + 1.6, PT + 2.6, cz - 4.7);
+    label3d('🚆 Metro', cx + sx + 1.6, PT + 3.7, cz - 4.7, '#2f6fb5', '#fff', 0.55);
+  }
+  const BW = 22, BD = 8, BH = 6, bz = cz + 4.9, fz = bz - BD / 2;
+  S.box(BW + 0.4, 0.5, BD + 0.4, 0xb7ad9c, cx, 0.55, bz);
+  S.box(BW, BH, BD, 0xf1e2c4, cx, 0.8 + BH / 2, bz);
+  S.box(BW + 0.7, 0.45, BD + 0.7, 0xe0cfae, cx, 0.8 + BH + 0.22, bz);
+  S.box(BW + 0.2, 0.18, 0.2, 0xe0cfae, cx, 0.8 + 3.2, fz - 0.1);
+  for (let k = -4; k <= 4; k++){ if (k === 0) continue; const x = cx + k * 2.35; S.pl(1.8, 3.6, TRIM, x, 1.3 + 2.4, fz - 0.02, Math.PI); WL.pl(1.5, 3.3, GLASS, x, 1.3 + 2.4, fz - 0.04, Math.PI); S.pl(0.08, 3.3, TRIM, x, 1.3 + 2.4, fz - 0.06, Math.PI); }
+  S.pl(3.2, 3.4, TRIM, cx, 1.3 + 1.7, fz - 0.02, Math.PI); S.pl(2.8, 3.2, 0x5a3e2e, cx, 1.3 + 1.6, fz - 0.04, Math.PI);
+  const tz = fz + 1.6, ttop = 0.8 + 12;
+  S.box(4, 12, 3.2, 0xf1e2c4, cx, 0.8 + 6, tz); S.box(4.4, 0.4, 3.6, 0xe0cfae, cx, ttop + 0.2, tz);
+  S.cyl(0, 3.1, 2.6, 4, 0x8c5a3c, cx, ttop + 0.4 + 1.3, tz);
+  S.cyl(0.06, 0.08, 3.2, 6, 0xdddddd, cx, ttop + 0.4 + 2.6 + 1.6, tz);
+  makeFlag(cx, ttop + 0.4 + 2.6 + 3.15, tz, 2.0, -Math.PI / 2);
+  const ck = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshLambertMaterial({map: clockTex, transparent: true}));
+  ck.position.set(cx, 0.8 + 9.6, tz - 1.62); ck.rotation.y = Math.PI; scene.add(ck); drawClock();
+  label3d('🚆 Mini Şehir Garı', cx, 0.8 + BH + 2.3, fz - 1.4, '#2f6fb5', '#fff', 1);
+  for (const sx of [-9.6, 9.6]){ S.box(1.3, 0.6, 1.3, 0xb7ad9c, cx + sx, PT + 0.3, cz - 2.6); S.ico(0.75, 0x4f8a45, cx + sx, PT + 1.05, cz - 2.6, 0.9); S.box(1.3, 0.6, 1.3, 0xb7ad9c, cx + sx, PT + 0.3, cz - 10); S.ico(0.75, 0x5e9450, cx + sx, PT + 1.05, cz - 10, 0.9); }
+  landmarks['Gar'] = [cx, cz - 6];
+  npcSpots.push({name: 'Gar Şefi Kemal', x: cx - 3, z: cz - 3, y: PT, path: [[cx - 3, cz - 3], [cx + 3, cz - 3], [cx + 3, cz - 10], [cx - 3, cz - 10]], say: ['Hoş geldin! Trenler her gece gelir 🚆', 'Yeni komşular yolda!', "Mini Şehir'e hoş geldin!"]});
+}
 const center = Math.floor(N / 2);
 for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
   const [cx, cz] = blockCenter(i, j);
@@ -383,12 +484,13 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
   }
   if (i === center - 1 && j === center){ // MUHTARLIK
     buildHouse(cx + 2, cz, Math.PI / 2, rnd, {w: 11, d: 8, floors: 2, wall: 0xf3e6cf, roof: 0x8c5a3c, doorX: 0, door: 0x6b4a3a});
-    S.cyl(0.08, 0.1, 9, 6, 0xdddddd, cx + 9.5, 4.8, cz - 4); S.box(0.06, 1.6, 2.4, 0xe30a17, cx + 9.5, 8.4, cz - 2.8);
+    S.cyl(0.08, 0.1, 9, 6, 0xdddddd, cx + 9.5, 4.8, cz - 4); makeFlag(cx + 9.5, 9.2, cz - 4, 2.6, -Math.PI / 2);
     for (const s of [-1, 1]) tree(S, cx - 8, cz + s * 8, 1);
     landmarks['Muhtarlık'] = [cx, cz]; label3d('Muhtarlık', cx + 2, 11.5, cz, '#2a2230');
     npcSpots.push({name: 'Muhtar Nuri', x: cx + 8.2, z: cz - 2, path: [[cx + 8.2, cz - 2], [cx + 8.2, cz + 4]], say: ['Mahallemize hoş geldin!', 'Takip eden herkese bir ev var 🏠', 'Evini bulamadın mı? Aramaya yaz!']});
     continue;
   }
+  if (i === center && j === center + 1){ buildStation(cx, cz); continue; }
   if (i === center + 1 && j === center){ // PARK
     G.box(10, 0.05, 8, 0xe8d8a8, cx, 0.36, cz);
     S.box(0.15, 3, 0.15, 0x3f8fbf, cx - 3, 1.8, cz - 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx - 3, 1.8, cz + 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx + 1, 1.8, cz - 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx + 1, 1.8, cz + 1.5);
@@ -427,6 +529,86 @@ const lampMat = new THREE.MeshBasicMaterial({color: 0xfff1c0});
   pts.forEach(([x, z]) => { S.cyl(0.1, 0.14, 4.4, 6, 0x3a3540, x, 2.5, z); });
   const ih = new THREE.InstancedMesh(new THREE.SphereGeometry(0.35, 8, 6), lampMat, pts.length);
   const o = new THREE.Object3D(); pts.forEach(([x, z], i) => { o.position.set(x, 4.8, z); o.updateMatrix(); ih.setMatrixAt(i, o.matrix); }); scene.add(ih);
+}
+// ---------- trafik: hareketli araclar + trafik isiklari ----------
+const LINES = Array.from({length: N + 1}, (_, k) => -HALF + k * PITCH);
+const TLI = new Set([2, 3, 4, 5]);
+const vehMat = new THREE.MeshLambertMaterial({vertexColors: true});
+const VG = (() => {
+  const B = new Bake(), o = {}, W = 0xffffff, GL = 0x26303a, DK = 0x2a2a2e;
+  const wheels = (xs, zs, r) => { for (const x of xs) for (const z of zs){ B.cyl(r, r, 0.28, 10, 0x1c1c20, x, r + 0.12, z, 0, Math.PI / 2); B.cyl(r * 0.5, r * 0.5, 0.3, 8, 0xb8bcc4, x, r + 0.12, z, 0, Math.PI / 2); } };
+  const lights = (w, y, zf, zb) => { for (const s of [-1, 1]){ B.box(0.36, 0.13, 0.05, 0xfff3cc, s * w, y, zf); B.box(0.36, 0.13, 0.05, 0xc0202a, s * w, y + 0.02, zb); } };
+  B.box(1.78, 0.52, 4.1, W, 0, 0.67, 0); B.box(1.5, 0.08, 1.9, W, 0, 1.43, -0.2); o.sedanB = B.geo();
+  B.box(1.6, 0.5, 2.2, GL, 0, 1.17, -0.15); B.box(1.82, 0.2, 0.18, DK, 0, 0.5, 2.08); B.box(1.82, 0.2, 0.18, DK, 0, 0.5, -2.08);
+  for (const s of [-1, 1]) B.box(0.12, 0.1, 0.2, DK, s * 0.95, 1.05, 0.85);
+  lights(0.58, 0.76, 2.06, -2.06); wheels([-0.86, 0.86], [-1.3, 1.3], 0.34); o.sedanD = B.geo();
+  B.box(0.72, 0.22, 0.34, 0x1d1d22, 0, 1.58, -0.2); B.box(0.68, 0.07, 0.32, 0xffd400, 0, 1.73, -0.2); o.taxiS = B.geo();
+  B.box(2.4, 2.5, 10, W, 0, 1.72, 0); B.box(2.42, 0.25, 10.02, W, 0, 3.0, 0); o.busB = B.geo();
+  B.box(2.44, 0.95, 8.4, GL, 0, 2.15, -0.4); B.box(2.2, 1.3, 0.06, GL, 0, 2.05, 5.02); B.box(0.06, 1.9, 1.0, GL, 1.22, 1.5, 3.7);
+  B.box(1.7, 0.32, 0.06, 0xffa31a, 0, 2.86, 5.04); for (const z of [5.05, -5.05]) B.box(2.42, 0.3, 0.2, DK, 0, 0.62, z);
+  lights(0.85, 0.9, 5.04, -5.04); wheels([-1.1, 1.1], [3.4, -3.0, -4.2], 0.45); o.busD = B.geo();
+  B.box(2.3, 2.3, 2.3, W, 0, 1.75, 4.05); B.box(2.2, 0.6, 1.3, W, 0, 3.2, 3.6); o.truckB = B.geo();
+  B.box(2.5, 2.9, 8.4, 0xeceae4, 0, 2.2, -1.75); B.box(1.4, 0.35, 10.6, DK, 0, 0.62, -0.2); B.box(2.1, 0.9, 0.06, GL, 0, 2.25, 5.22); B.box(1.6, 0.6, 0.06, 0x9aa0a8, 0, 1.15, 5.22);
+  B.box(2.52, 0.12, 8.42, 0xc0392b, 0, 1.0, -1.75);
+  lights(0.85, 0.9, 5.22, -5.97); wheels([-1.1, 1.1], [4.4, -3.6, -4.9], 0.48); o.truckD = B.geo();
+  return o;
+})();
+const VT = {sedan: {len: 4.3, v: 7.5}, taxi: {len: 4.3, v: 8}, bus: {len: 10.3, v: 5.5}, truck: {len: 10.8, v: 5.2}};
+const CARC = [0xf2f2f2, 0xc9ccd2, 0x2b2d33, 0xc23b3b, 0x3d6aa8, 0xd8c8a8, 0x5d7f5a, 0x7a2e3a, 0x1f4f7a, 0xe07b2a, 0x8a9aa8, 0x4a3b6b, 0x2e6b5a, 0xb9a06a];
+const BUSC = [0x2f6fb5, 0xe07b2a, 0x2e8b6a], TRUCKC = [0xc23b3b, 0x1f4f7a, 0xf2f2f2, 0x4a6b3a];
+const VEH = [], vr = RNG(4242);
+function spawnV(type){
+  for (let tries = 0; tries < 30; tries++){
+    const axis = vr() < .5 ? 'x' : 'z', li = Math.floor(vr() * (N + 1)), dir = vr() < .5 ? 1 : -1, s0 = (vr() - .5) * 2 * (HALF + 15), len = VT[type].len;
+    if (VEH.some(o => o.axis === axis && o.li === li && o.dir === dir && Math.abs(o.s - s0) < (o.len + len) / 2 + 6)) continue;
+    VEH.push({type, axis, li, line: LINES[li], dir, s: s0, v: 0, vmax: VT[type].v * (0.85 + vr() * 0.3), len}); return;
+  }
+}
+for (let k = 0; k < 34; k++) spawnV('sedan'); for (let k = 0; k < 6; k++) spawnV('taxi'); for (let k = 0; k < 4; k++) spawnV('bus'); for (let k = 0; k < 4; k++) spawnV('truck');
+const VM = {};
+{
+  const cnt = {sed: 0, taxi: 0, bus: 0, truck: 0};
+  VEH.forEach(v => { if (v.type === 'sedan' || v.type === 'taxi'){ v.mb = 'sedanB'; v.md = 'sedanD'; v.i = cnt.sed++; if (v.type === 'taxi') v.ti = cnt.taxi++; } else if (v.type === 'bus'){ v.mb = 'busB'; v.md = 'busD'; v.i = cnt.bus++; } else { v.mb = 'truckB'; v.md = 'truckD'; v.i = cnt.truck++; } });
+  const mk = (k, n) => { const m = new THREE.InstancedMesh(VG[k], vehMat, Math.max(1, n)); m.count = n; m.frustumCulled = false; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); VM[k] = m; };
+  mk('sedanB', cnt.sed); mk('sedanD', cnt.sed); mk('taxiS', cnt.taxi); mk('busB', cnt.bus); mk('busD', cnt.bus); mk('truckB', cnt.truck); mk('truckD', cnt.truck);
+  const col = new THREE.Color();
+  VEH.forEach(v => { const c = v.type === 'taxi' ? 0xf2c12e : v.type === 'bus' ? pick(BUSC, vr) : v.type === 'truck' ? pick(TRUCKC, vr) : pick(CARC, vr); VM[v.mb].setColorAt(v.i, col.setHex(c)); VM[v.md].setColorAt(v.i, col.setHex(0xffffff)); if (v.type === 'taxi') VM.taxiS.setColorAt(v.ti, col.setHex(0xffffff)); });
+}
+function lightState(axis, t){ const c = t % 15; if (axis === 'z') return c < 6 ? 'g' : c < 7.5 ? 'y' : 'r'; return c >= 7.5 && c < 13.5 ? 'g' : c >= 13.5 ? 'y' : 'r'; }
+const _vq = new THREE.Quaternion(), _vp = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), _up = new THREE.Vector3(0, 1, 0), _vm = new THREE.Matrix4();
+function updateTraffic(dt, t){
+  for (const v of VEH){
+    let target = v.vmax;
+    const ls = lightState(v.axis, t);
+    if (TLI.has(v.li) && ls !== 'g'){
+      const front = v.s + v.dir * v.len / 2;
+      for (const m of TLI){ const stop = LINES[m] - v.dir * 6.9, d = (stop - front) * v.dir; if (d > -0.3 && d < 16){ if (!(ls === 'y' && d < 2.5)) target = Math.min(target, Math.max(0, (d - 0.2) * 1.1)); break; } }
+    }
+    for (const o of VEH){ if (o === v || o.axis !== v.axis || o.li !== v.li || o.dir !== v.dir) continue; const gap = (o.s - v.s) * v.dir - (o.len + v.len) / 2; if (gap > -1 && gap < 9) target = Math.min(target, Math.max(0, (gap - 1.8) * 1.4)); }
+    v.v = target < v.v ? Math.max(target, v.v - 10 * dt) : Math.min(target, v.v + 2.6 * dt);
+    v.s += v.dir * v.v * dt;
+    const lim = HALF + 22; if (v.s * v.dir > lim) v.s = -v.dir * lim;
+    const x = v.axis === 'z' ? v.line - v.dir * 1.25 : v.s, z = v.axis === 'z' ? v.s : v.line + v.dir * 1.25;
+    const ry = v.axis === 'z' ? (v.dir > 0 ? 0 : Math.PI) : (v.dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+    _vm.compose(_vp.set(x, 0, z), _vq.setFromAxisAngle(_up, ry), _one);
+    VM[v.mb].setMatrixAt(v.i, _vm); VM[v.md].setMatrixAt(v.i, _vm); if (v.type === 'taxi') VM.taxiS.setMatrixAt(v.ti, _vm);
+  }
+  for (const k in VM){ VM[k].instanceMatrix.needsUpdate = true; if (VM[k].instanceColor && !VM[k]._cd){ VM[k].instanceColor.needsUpdate = true; VM[k]._cd = 1; } }
+}
+const bulbs = [];
+for (const a of TLI) for (const b of TLI){
+  const X = LINES[a], Z = LINES[b];
+  for (const [px, pz] of [[X + 4.3, Z - 4.3], [X - 4.3, Z + 4.3]]){
+    S.cyl(0.08, 0.1, 3.4, 6, 0x2a2a30, px, 2.0, pz); S.box(0.42, 1.05, 0.42, 0x1d1d22, px, 3.95, pz);
+    for (const [nx, nz, axis] of [[0, 1, 'z'], [0, -1, 'z'], [1, 0, 'x'], [-1, 0, 'x']]) ['r', 'y', 'g'].forEach((col, k) => bulbs.push({x: px + nx * 0.22, y: 4.3 - k * 0.32, z: pz + nz * 0.22, axis, col}));
+  }
+}
+const bulbIM = new THREE.InstancedMesh(new THREE.SphereGeometry(0.11, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff}), bulbs.length);
+bulbs.forEach((b, i) => { bulbIM.setMatrixAt(i, new THREE.Matrix4().makeTranslation(b.x, b.y, b.z)); }); scene.add(bulbIM);
+const BULBC = {r: [0xff3030, 0x3a1010], y: [0xffc020, 0x3a2c10], g: [0x30e060, 0x10351a]};
+function updateLights(t){
+  const key = lightState('z', t) + lightState('x', t); if (key === updateLights.k) return; updateLights.k = key;
+  const c = new THREE.Color(); bulbs.forEach((b, i) => bulbIM.setColorAt(i, c.setHex(BULBC[b.col][lightState(b.axis, t) === b.col ? 0 : 1]))); bulbIM.instanceColor.needsUpdate = true;
 }
 
 
@@ -491,6 +673,12 @@ for (const R of Object.values(ROOMS)){
   npcSpots.push({...R.keeper, room: R.name, x: R.x + R.keeper.path[0][0], z: R.z + R.keeper.path[0][1], path: R.keeper.path.map(([a, b]) => [R.x + a, R.z + b])});
   R.guests.forEach(g => npcSpots.push({name: g.name, say: g.say, room: R.name, sit: R.seats[g.seat], x: R.seats[g.seat].x, z: R.seats[g.seat].z}));
 }
+{ // EV ICI (sablon oda)
+  const R = {name: 'Ev', x: 20, z: -700, w: 12, d: 9, icon: '🏠', seats: []}; ROOMS.Ev = R;
+  roomShell(R.x, R.z, R.w, R.d, 0xf3ece0, 0xc9a27a, 0xb08a62);
+  addTable(S, 3.6, 2.4, true, R.seats); S.box(1.0, 2.2, 0.08, 0x6b4a3a, -4.4, 1.4, -4.46);
+  S.reset(); G.reset(); WL.reset();
+}
 
 // ---------- tabelalar (bos arsalar) ----------
 function signTexture(){
@@ -526,6 +714,9 @@ function makeParts(C){
     hairS: mergeGeometries([vc(BX(.5, .15, .48), 0xffffff, 0, .52, 0), vc(BX(.5, .34, .1), 0xffffff, 0, .36, -.21), vc(BX(.5, .1, .08), 0xffffff, 0, .45, .21)]),
     hairL: mergeGeometries([vc(BX(.52, .16, .5), 0xffffff, 0, .52, 0), vc(BX(.52, .7, .12), 0xffffff, 0, .18, -.22), vc(BX(.08, .5, .36), 0xffffff, -.26, .28, -.04), vc(BX(.08, .5, .36), 0xffffff, .26, .28, -.04), vc(BX(.5, .1, .08), 0xffffff, 0, .45, .22)]),
     cape: mergeGeometries([vc(BX(.74, 1.25, .04), 0xffffff, 0, -.62, 0), vc(BX(.6, .1, .12), 0xd4a63a, 0, 0, .02)]),
+    glasses: mergeGeometries([vc(BX(.15, .1, .03), 0x1a1a1a, -.1, .29, .235), vc(BX(.15, .1, .03), 0x1a1a1a, .1, .29, .235), vc(BX(.06, .03, .03), 0x1a1a1a, 0, .3, .235)]),
+    scarf: mergeGeometries([vc(BX(.5, .12, .44), 0xffffff, 0, .02, 0), vc(BX(.12, .34, .06), 0xffffff, .12, -.14, .23)]),
+    bag: mergeGeometries([vc(BX(.38, .42, .16), 0xffffff, 0, .4, -.28), vc(BX(.05, .5, .03), 0x5a4030, -.14, .5, -.17), vc(BX(.05, .5, .03), 0x5a4030, .14, .5, -.17)]),
     cap: mergeGeometries([vc(new THREE.CylinderGeometry(.27, .27, .18, 10), 0xffffff, 0, .56, 0), vc(BX(.38, .04, .24), 0xffffff, 0, .48, .3)]),
   };
   const mat = new THREE.MeshLambertMaterial({vertexColors: true});
@@ -545,30 +736,35 @@ function setLook(i, look){
   const sc = (m, j, h) => m.setColorAt(j, c.set(h));
   sc(P.leg, i * 2, look.pants); sc(P.leg, i * 2 + 1, look.pants); sc(P.arm, i * 2, look.shirt); sc(P.arm, i * 2 + 1, look.shirt);
   sc(P.hand, i * 2, look.skin); sc(P.hand, i * 2 + 1, look.skin); sc(P.torso, i, look.shirt); sc(P.skirt, i, look.skirtC); sc(P.head, i, look.skin);
-  sc(P.hairS, i, look.hair); sc(P.hairL, i, look.hair); sc(P.cap, i, look.capC); sc(P.cape, i, 0x8b1e2d);
+  sc(P.hairS, i, look.hair); sc(P.hairL, i, look.hair); sc(P.cap, i, look.capC); sc(P.cape, i, 0x8b1e2d); sc(P.glasses, i, 0xffffff); sc(P.scarf, i, 0xc0392b); sc(P.bag, i, 0x8a5a3a);
 }
 function makeLook(r){
   const f = r() < 0.5;
   return {skin: pick(SKIN, r), shirt: pick(SHIRT, r), pants: pick(PANTS, r), hair: pick(HAIR, r), capC: pick(CAP, r), skirtC: pick(SHIRT, r),
-    hairStyle: f ? (r() < 0.85 ? 'L' : 'S') : (r() < 0.9 ? 'S' : '-'), skirt: f && r() < 0.45, cap: r() < 0.22, s: 1.0 + r() * 0.18};
+    hairStyle: f ? (r() < 0.85 ? 'L' : 'S') : (r() < 0.9 ? 'S' : '-'), skirt: f && r() < 0.45, cap: r() < 0.22, s: 0.8 + r() * 0.12};
 }
 const labels = new Map();
 function makeLabel(p){
-  if (labels.has(p.key)) return labels.get(p.key);
-  const s = p.npc ? label3d(p.name, 0, -99, 0, 'rgba(42,34,48,.88)', '#fff', 0.7) : p.founder ? label3d('★ @' + p.r.u, 0, -99, 0, 'rgba(42,34,48,.92)', '#ffd56a', 0.8) : label3d('@' + p.r.u, 0, -99, 0, 'rgba(251,247,239,.95)', '#2a2230', 0.75);
-  s.visible = false; labels.set(p.key, s); return s;
+  const key = (p.worker && !p.founder ? 'w:' : '') + p.key;
+  if (labels.has(key)) return labels.get(key);
+  const s = p.npc ? label3d(p.name, 0, -99, 0, 'rgba(42,34,48,.88)', '#fff', 0.7)
+    : p.founder ? label3d('★ @' + p.r.u, 0, -99, 0, 'rgba(42,34,48,.92)', '#ffd56a', 0.8)
+    : p.worker ? label3d('💼 @' + p.r.u, 0, -99, 0, 'rgba(255,138,42,.95)', '#fff', 0.75)
+    : label3d('@' + p.r.u, 0, -99, 0, 'rgba(251,247,239,.95)', '#2a2230', 0.75);
+  s.visible = false; labels.set(key, s); return s;
 }
 const lw = (L, lx, lz) => [L.x + lx * Math.cos(L.ry) + lz * Math.sin(L.ry), L.z - lx * Math.sin(L.ry) + lz * Math.cos(L.ry)];
 function newTarget(p){
   if (p.sit) return;
-  if (p.npc){ if (!p.path) return; p.pi = ((p.pi || 0) + 1) % p.path.length; p.tgt.set(p.path[p.pi][0], 0, p.path[p.pi][1]); return; }
+  const path = p.housePath || (p.worker ? p.wpath : null) || (p.npc ? p.path : null);
+  if (path || p.npc){ if (!path) return; p.pi = ((p.pi || 0) + 1) % path.length; p.tgt.set(path[p.pi][0], 0, path[p.pi][1]); p.y0 = p.y1 = p.yb ?? 0.3; p.d0 = 1; return; }
   if (!p.q || !p.q.length){
     const L = p.r.lot, P2 = (lx, lz, g) => { const [x, z] = lw(L, lx, lz); return {x, z, g}; };
     if (p.inG) p.q = [P2(p.dx, FZ - 1.2, true), P2(p.dx, WALKZ, false), P2((Math.random() - .5) * 22, WALKZ, false)];
     else if (Math.random() < 0.25) p.q = [P2(p.dx, WALKZ, false), P2(p.dx + (Math.random() - .5) * 1.2, FZ - 1.2, true)];
     else p.q = [P2((Math.random() - .5) * 22, WALKZ, false)];
   }
-  const t = p.q.shift(); p.tgt.set(t.x, 0, t.z); p.tg = t.g;
+  const t = p.q.shift(); p.tgt.set(t.x, 0, t.z); p.tg = t.g; p.y0 = p.yb ?? 0.3; p.y1 = t.y ?? 0.3; p.d0 = Math.hypot(t.x - p.pos.x, t.z - p.pos.z);
 }
 async function loadResidents(){
   residents = (await residentsP).map((r, i) => ({...r, u: norm(r.u), idx: i}));
@@ -577,10 +773,11 @@ async function loadResidents(){
   const n = residents.length;
   $('pop').textContent = n.toLocaleString('tr-TR');
   // evler + bos arsalar
-  const signs = [];
+  const signs = [], byIdx = new Map(residents.map(r => [r.idx, r]));
   lots.forEach(L => {
     const r = RNG(9000 + L.i * 131);
-    if (L.owner !== undefined){ const h = buildHouse(L.x, L.z, L.ry, r); L.h = h; garden(L.x, L.z, L.ry, h, LW, FZ, r); }
+    if (L.owner !== undefined && (byIdx.get(L.owner) || {}).u === FOUNDER){ L.h = founderHouse(L); }
+    else if (L.owner !== undefined){ const h = buildHouse(L.x, L.z, L.ry, r); L.h = h; garden(L.x, L.z, L.ry, h, LW, FZ, r); }
     else {
       G.frame(L.x, L.z, L.ry); G.box(LW - 0.6, 0.04, 9, 0xb7c98d, 0, 0.35, 0.9); G.reset();
       S.frame(L.x, L.z, L.ry); for (const s of [-1, 1]) S.box(0.12, 1.9, 0.12, 0x8a6347, s * 1.15, 1.25, 4.5); S.box(2.6, 1.5, 0.08, 0xffffff, 0, 1.75, 4.6); S.reset();
@@ -600,14 +797,14 @@ async function loadResidents(){
   people.parts = makeParts(Math.max(1, C));
   residents.forEach((r, i) => {
     const look = makeLook(RNG(hashStr(r.u)));
-    if (r.u === FOUNDER) Object.assign(look, {hair: 0x2b2118, shirt: 0x2f3a52, pants: 0x23232a, hairStyle: 'S', cap: false, skirt: false, s: 1.12});
+    if (r.u === FOUNDER) Object.assign(look, {hair: 0x2b2118, shirt: 0x2f3a52, pants: 0x23232a, hairStyle: 'S', cap: false, skirt: false, s: 0.9});
     const [hx, hz] = lw(r.lot, r.lot.h ? r.lot.h.dx : 0, WALKZ);
-    const p = {key: 'u:' + r.u, r, founder: r.u === FOUNDER, look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
+    const p = {key: 'u:' + r.u, r, founder: r.u === FOUNDER, look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, speed0: 1.4, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
     newTarget(p); people.list.push(p); setLook(i, look);
   });
   npcSpots.forEach((s, k) => {
     const look = makeLook(RNG(hashStr(s.name))), i = n + k;
-    const p = {key: 'n:' + s.name, npc: true, name: s.name, say: s.say, path: s.path, pi: 0, room: s.room, sit: s.sit, look, s: look.s, home: new THREE.Vector3(s.x, 0, s.z), pos: new THREE.Vector3(s.x, 0, s.z), tgt: new THREE.Vector3(s.x, 0, s.z), speed: 1.1, wait: Math.random() * 3, ph: 0, dir: s.sit ? s.sit.dir : 0, jump: 0, wave: 0};
+    const p = {key: 'n:' + s.name, npc: true, name: s.name, say: s.say, path: s.path, pi: 0, room: s.room, sit: s.sit, yb: s.y ?? 0.3, look, s: look.s, home: new THREE.Vector3(s.x, 0, s.z), pos: new THREE.Vector3(s.x, 0, s.z), tgt: new THREE.Vector3(s.x, 0, s.z), speed: 1.1, wait: Math.random() * 3, ph: 0, dir: s.sit ? s.sit.dir : 0, jump: 0, wave: 0};
     newTarget(p); people.list.push(p); setLook(i, look);
   });
   for (const k in people.parts) people.parts[k].count = k === 'leg' || k === 'arm' || k === 'hand' ? C * 2 : C;
@@ -628,8 +825,9 @@ function updatePeople(dt, now){
     else if (p.wait > 0){ p.wait -= dt; p.moving = false; }
     else {
       const dx = p.tgt.x - p.pos.x, dz = p.tgt.z - p.pos.z, len = Math.hypot(dx, dz);
-      if (len < 0.15){ p.inG = p.tg; p.wait = (p.q && p.q.length) ? 0.05 : 1.5 + Math.random() * 5; p.moving = false; newTarget(p); }
+      if (len < 0.15){ p.inG = p.tg; if (p.y1 !== undefined) p.yb = p.y1; if (p.arriving && !(p.q && p.q.length)){ p.arriving = false; p.speed = p.speed0 || 1.4; } p.wait = (p.q && p.q.length) ? 0.05 : 1.5 + Math.random() * 5; p.moving = false; newTarget(p); }
       else {
+        if (p.y1 !== undefined && p.d0 > 0.01) p.yb = p.y1 + (p.y0 - p.y1) * Math.min(1, len / p.d0);
         const st = Math.min(len, p.speed * dt); p.pos.x += dx / len * st; p.pos.z += dz / len * st; p.ph += st * 3.4; p.moving = true;
         let da = Math.atan2(dx, dz) - p.dir; da = Math.atan2(Math.sin(da), Math.cos(da)); p.dir += da * Math.min(1, dt * 8);
       }
@@ -643,7 +841,7 @@ function updatePeople(dt, now){
       D.legL.rotation.x = -1.45; D.legR.rotation.x = -1.45;
       const ph2 = (t * 0.5 + i * 1.3) % 7; D.armL.rotation.set(-0.45, 0, -0.05); D.armR.rotation.set(ph2 < 1.4 ? -1.95 : -0.45, 0, 0.05);
     } else {
-    R0.position.set(p.pos.x, 0.3 + jy + (p.moving ? Math.abs(Math.sin(p.ph)) * 0.05 : Math.sin(t * 2 + i) * 0.01), p.pos.z);
+    R0.position.set(p.pos.x, (p.yb ?? 0.3) + jy + (p.moving ? Math.abs(Math.sin(p.ph)) * 0.05 : Math.sin(t * 2 + i) * 0.01), p.pos.z);
     R0.rotation.set(0, p.dir, 0); R0.scale.setScalar(sc);
     D.legL.rotation.x = sw; D.legR.rotation.x = -sw;
     D.armL.rotation.set(-sw * 0.8, 0, -0.07); D.armR.rotation.set(sw * 0.8, 0, 0.07);
@@ -658,12 +856,14 @@ function updatePeople(dt, now){
     P.hand.setMatrixAt(i * 2, D.armL.matrixWorld); P.hand.setMatrixAt(i * 2 + 1, D.armR.matrixWorld);
     P.torso.setMatrixAt(i, D.torso.matrixWorld); P.head.setMatrixAt(i, D.head.matrixWorld);
     P.skirt.setMatrixAt(i, p.look.skirt ? D.torso.matrixWorld : ZERO);
-    P.hairS.setMatrixAt(i, (p.look.hairStyle === 'S' && (!p.look.cap || p.founder)) || (p.founder && p.look.hairStyle === '-') ? D.head.matrixWorld : ZERO);
+    const acc = p.look.acc, capOn = acc !== undefined ? acc === 'sapka' : (p.look.cap && !p.founder);
+    P.hairS.setMatrixAt(i, p.look.hairStyle === 'S' && !capOn ? D.head.matrixWorld : ZERO);
     P.hairL.setMatrixAt(i, p.look.hairStyle === 'L' ? D.head.matrixWorld : ZERO);
-    P.cap.setMatrixAt(i, p.look.cap && !p.founder ? D.head.matrixWorld : ZERO);
+    P.cap.setMatrixAt(i, capOn ? D.head.matrixWorld : ZERO);
+    P.glasses.setMatrixAt(i, acc === 'gozluk' ? D.head.matrixWorld : ZERO); P.scarf.setMatrixAt(i, acc === 'atki' ? D.head.matrixWorld : ZERO); P.bag.setMatrixAt(i, acc === 'canta' ? D.torso.matrixWorld : ZERO);
     P.cape.setMatrixAt(i, p.founder ? D.cape.matrixWorld : ZERO);
-    _m.compose(_v.set(p.sit ? p.sit.x : p.pos.x, 0.37, p.sit ? p.sit.z : p.pos.z), _q.identity(), _s.setScalar(sc * (1 - jy * 0.4))); P.shadow.setMatrixAt(i, _m);
-    p.top = (p.sit ? p.sit.y - 0.78 * sc : 0.3) + jy + 2.25 * sc; if (p.sit){ p.pos.x = p.sit.x; p.pos.z = p.sit.z; }
+    _m.compose(_v.set(p.sit ? p.sit.x : p.pos.x, p.sit ? 0.37 : (p.yb ?? 0.3) + 0.07, p.sit ? p.sit.z : p.pos.z), _q.identity(), _s.setScalar(sc * (1 - jy * 0.4))); P.shadow.setMatrixAt(i, _m);
+    p.top = (p.sit ? p.sit.y - 0.78 * sc : (p.yb ?? 0.3)) + jy + 2.25 * sc; if (p.sit){ p.pos.x = p.sit.x; p.pos.z = p.sit.z; }
     if (p.bub){ p.bub.t -= dt; p.bub.s.position.set(p.pos.x, p.top + 2.3, p.pos.z); p.bub.s.material.opacity = Math.min(1, p.bub.t * 2); if (p.bub.t <= 0){ scene.remove(p.bub.s); p.bub.s.material.map.dispose(); p.bub.s.material.dispose(); p.bub = null; } }
     if (p.hl){ ring.visible = true; ring.position.set(p.pos.x, 0.4, p.pos.z); ring.scale.setScalar(1 + Math.sin(t * 5) * 0.12); }
   }
@@ -675,7 +875,7 @@ function updateLabels(){
   const cp = camera.position; const arr = people.list.map((p, i) => [p.pos.distanceToSquared(cp), i]).sort((a, b) => a[0] - b[0]);
   const show = new Set(arr.slice(0, 36).filter(a => a[0] < 90 * 90).map(a => a[1]));
   if (focus) show.add(focus.i);
-  people.list.forEach((p, i) => { const vis = show.has(i); if (vis){ const s = makeLabel(p); s.visible = true; s.position.set(p.pos.x, (p.top || 2.6) + 0.55, p.pos.z); } else { const s = labels.get(p.key); if (s) s.visible = false; } });
+  people.list.forEach((p, i) => { const vis = show.has(i); const sel = vis ? makeLabel(p) : null; for (const k of [p.key, 'w:' + p.key]){ const s = labels.get(k); if (s && s !== sel) s.visible = false; } if (sel){ sel.visible = true; sel.position.set(p.pos.x, (p.top || 2.6) + 0.55, p.pos.z); } });
 }
 function bubble(p, text){
   if (p.bub){ scene.remove(p.bub.s); p.bub = null; }
@@ -716,7 +916,7 @@ function tap(x, y){
   if (inside) return;
   let lb = null; bd = 70 * 70;
   lots.forEach(L => { const s = scr(L.x, 2.5, L.z); if (!s) return; const d = (s[0] - x) ** 2 + (s[1] - y) ** 2; if (d < bd){ bd = d; lb = L; } });
-  if (lb && lb.owner !== undefined){ const i = people.list.findIndex(p => p.r && p.r.idx === lb.owner); if (i >= 0){ react(i); return; } }
+  if (lb && lb.owner !== undefined){ const i = people.list.findIndex(p => p.r && p.r.idx === lb.owner); if (i >= 0){ houseTag(lb, people.list[i].r.u); showCard(people.list[i]); return; } }
   if (lb) { showJoin(); return; }
 }
 
@@ -751,27 +951,30 @@ const getMe = () => { if (ME.u) return ME.u; try { return localStorage.getItem('
 function showBuilding(name){
   const R = ROOMS[name], occ = roomPeople(name);
   $('cardbody').innerHTML = `<h2>${R.icon} ${name}</h2><p>İçeride <b>${occ.length} kişi</b> var: ${occ.map(p => p.npc ? p.name : '@' + p.r.u).join(', ')}</p>
-  <div class="row"><button class="pri btn" id="enter">İçeri gir 🚪</button></div>`;
-  $('enter').onclick = () => enterRoom(name);
+  <p>Burada <b>1 saat çalış</b>, <b>10 coin</b> kazan. Siteden çıksan da işin devam eder.</p>
+  <div class="row"><button class="pri btn" id="enter">İçeri gir 🚪</button><button class="sec btn" id="work">${working() && MYP.work_place === name ? '💼 Çalışıyorsun' : '💼 Çalış'}</button></div>`;
+  $('enter').onclick = () => enterRoom(name); $('work').onclick = () => startWork(name);
   $('card').classList.add('show');
 }
 function flyToPos(pos, tgt, ms = 1500){ fly = {from: {p: camera.position.clone(), t: controls.target.clone()}, to: {p: pos, t: tgt}, t0: performance.now(), ms}; }
 function enterRoom(name){
+  if (name !== 'Ev' && working() && MYP.work_place !== name){ toast('Çalışırken başka yere giremezsin. Önce işi bırak.'); return; }
   const R = ROOMS[name]; inside = name; $('card').classList.remove('show');
   const me = getMe(), mi = people.list.findIndex(p => p.r && p.r.u === me);
-  if (mi >= 0){
+  if (mi >= 0 && !people.list[mi].worker && name !== 'Ev'){
     const p = people.list[mi], taken = new Set(people.list.filter(q => q.sit).map(q => q.sit)), seat = R.seats.find(st => !taken.has(st));
     if (seat){ p.prevPos = p.pos.clone(); p.sit = seat; p.room = name; p.dir = seat.dir; p.q = []; p.jump = 0.55; toast(`@${me} içeri girdi`); }
   }
   const hf = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect), dd = Math.max(20, (R.w / 2 + 1.2) / Math.tan(hf / 2));
   flyToPos(new THREE.Vector3(R.x, dd * 0.82, R.z + dd * 0.55), new THREE.Vector3(R.x, 0, R.z));
-  $('intitle').textContent = `${R.icon} ${name} · ${roomPeople(name).length} kişi`; $('inbar').classList.add('show');
+  $('intitle').textContent = name === 'Ev' ? R.title : `${R.icon} ${name} · ${roomPeople(name).length} kişi`; $('inbar').classList.add('show'); document.body.classList.add('inroom');
   updateSky();
 }
 function exitRoom(){
   if (!inside) return; const R = ROOMS[inside];
-  people.list.forEach(p => { if (!p.npc && p.room === inside){ p.sit = null; p.room = null; p.pos.copy(p.home); p.tgt.copy(p.home); p.inG = false; p.q = []; } });
-  inside = null; $('inbar').classList.remove('show'); updateSky();
+  people.list.forEach(p => { if (!p.npc && !p.worker && p.room === inside){ p.sit = null; p.room = null; p.pos.copy(p.home); p.tgt.copy(p.home); p.inG = false; p.q = []; } });
+  inside = null; $('inbar').classList.remove('show'); document.body.classList.remove('inroom'); updateSky();
+  if (R === ROOMS.Ev){ if (furn){ scene.remove(furn); furn.geometry.dispose(); furn = null; } camera.position.set(R.ox + 20, 24, R.oz + 34); controls.target.set(R.ox, 0, R.oz); flyTo(R.ox, R.oz, 22, 18, 900, R.ory); return; }
   camera.position.set(R.ox + 20, 24, R.oz + 34); controls.target.set(R.ox, 0, R.oz); flyTo(R.ox, R.oz, 28, 20, 900);
 }
 $('exitbtn').onclick = exitRoom;
@@ -796,6 +999,9 @@ function updateFly(){
 // ---------- bul + kart ----------
 let focus = null;
 function findUser(q){
+  const raw = (q || '').trim().toLocaleLowerCase('tr');
+  if (/^(evime git|evim|evime|ev)$/.test(raw)){ goHome(); return; }
+  const lm = Object.keys(landmarks).find(k => k.toLocaleLowerCase('tr') === raw); if (lm){ flyTo(landmarks[lm][0], landmarks[lm][1], 34, 24); return; }
   q = norm(q); if (!q){ toast('Bir kullanıcı adı yaz'); return; }
   const i = people.list.findIndex(p => p.r && p.r.u === q);
   if (i < 0){ showCard(null, q); return; }
@@ -815,13 +1021,20 @@ function showCard(p, q){
     <div class="row"><a class="pri" href="${IG}" target="_blank" rel="noopener">Instagram'a git</a></div>`;
   } else {
     const r = p.r; const no = r.idx + 1;
-    b.innerHTML = `<h2>${p.founder ? '★ ' : ''}@${r.u}</h2><p>${p.founder ? 'Kurucu · Mini Şehir\'in yapımcısı' : no + '. komşu · ' + (r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Mini Şehir sakini')}</p>
+    const mine = ME.u === r.u;
+    b.innerHTML = `<h2>${p.founder ? '★ ' : ''}@${r.u}${mine ? '<button class="btn mebtn" id="mebtn">👤 Ben</button>' : ''}</h2><p>${p.founder ? 'Kurucu · Mini Şehir\'in yapımcısı' : no + '. komşu · ' + (r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Mini Şehir sakini')}</p>
     <p>${ME.u === r.u ? '<span class="ok">✓ Senin evin</span>' : r.claimed ? '<span class="ok">✓ Sahibi var</span>' : 'Bu ev sahibini bekliyor 🔑'}</p>
-    <div class="locks"><div>Evini süsle</div><div>Bahçe ekle</div><div>Evine davet et</div><div>Altın topla</div></div>
-    <p style="font-size:12px">Takibi bırakanın evi boşaltılır.</p>
-    <div class="row">${ME.u === r.u ? `<button class="pri btn" id="share">Evimi paylaş</button><button class="sec btn" id="notifs">🔔 Bildirimler${ME.unseen ? ' (' + ME.unseen + ')' : ''}</button>`
-      : !r.claimed ? `<button class="pri btn" id="claim">Evimi sahiplen 🔑</button><button class="sec btn" id="share">Paylaş</button>`
-      : `<button class="pri btn" id="knock">Kapıyı çal 🚪</button><button class="sec btn" id="share">Paylaş</button>`}</div>`;
+    ${p.worker ? `<p>💼 Şu an <b>${LOC[p.worker]}</b> çalışıyor</p>` : ''}
+    ${mine ? `<p>🪙 <b>${MYP ? MYP.coins : 0}</b> coin · Fırın ya da Kahvehane'de çalışarak kazan</p>` : ''}
+    <div class="row">${mine ? `<button class="pri btn" id="ehouse">🏠 Evime gir</button><button class="sec btn" id="shop">🛍️ Mağaza</button>`
+      : !r.claimed ? `<button class="pri btn" id="claim">Evimi sahiplen 🔑</button><button class="sec btn" id="ehouse">🏠 İçeri bak</button>`
+      : `<button class="pri btn" id="knock">Kapıyı çal 🚪</button><button class="sec btn" id="like">❤️ Beğen</button>`}</div>
+    <div class="row">${mine ? `<button class="sec btn" id="notifs">🔔 Bildirimler${ME.unseen ? ' (' + ME.unseen + ')' : ''}</button><button class="sec btn" id="share">Paylaş</button>`
+      : r.claimed ? `<button class="sec btn" id="ehouse">🏠 Evine gir</button><button class="sec btn" id="share">Paylaş</button>` : `<button class="sec btn" id="share">Paylaş</button>`}</div>`;
+    if ($('mebtn')) $('mebtn').onclick = () => showEditor();
+    if ($('shop')) $('shop').onclick = () => showShop();
+    if ($('like')) $('like').onclick = () => doLike(p);
+    if ($('ehouse')) $('ehouse').onclick = () => enterHouse(r.u);
     if ($('claim')) $('claim').onclick = () => showClaim(p);
     if ($('knock')) $('knock').onclick = () => doKnock(p);
     if ($('notifs')) $('notifs').onclick = showNotifs;
@@ -832,6 +1045,237 @@ function showCard(p, q){
     };
   }
   $('card').classList.add('show');
+}
+
+// ---------- ev etiketi ----------
+let htag = null;
+function houseTag(L, u){
+  if (htag){ scene.remove(htag.s); htag = null; }
+  const s = label3d('🏠 @' + u, L.x, (L.h ? 8.2 : 5), L.z, 'rgba(42,34,48,.92)', '#fff', 1.0); htag = {s, t: 5};
+}
+// ---------- profil / coin / is / magaza ----------
+const PROF = new Map(); let MYP = null;
+const LOC = {'Fırın': "Fırın'da", 'Kahvehane': "Kahvehane'de"};
+const SKINS = [0xf6d7b8, 0xeac4a0, 0xd8a77e, 0xc08a5e, 0x9a6640, 0x6e4a2e];
+const HAIRS = [0x1d1a18, 0x3b2a1f, 0x6b4a2e, 0xa8743f, 0xd9b36a, 0xb5452a, 0x9a9a9a, 0xe8e2d4];
+const CLOTH = [0xe24f4f, 0xf4a742, 0xf4d742, 0x5fb760, 0x3d8fd1, 0x2f3a52, 0x8e5ac8, 0xe07bb0, 0xf2f2f2, 0x2a2a2e, 0x8a6347, 0x4fb3a8];
+const ITEMS = {
+  kiyafet: [['sapka', '🧢', 'Şapka', 15], ['gozluk', '🕶️', 'Gözlük', 20], ['atki', '🧣', 'Atkı', 15], ['canta', '🎒', 'Çanta', 20]],
+  dis: [['cicek', '🌷', 'Çiçekler', 10], ['bank', '🪑', 'Bank', 10], ['agac', '🌳', 'Ağaç', 10], ['fener', '🏮', 'Fener', 15], ['bayrak', '🇹🇷', 'Bayrak', 20], ['cesme', '⛲', 'Çeşme', 40], ['havuz', '🏊', 'Havuz', 60]],
+  ic: [['hali', '🟥', 'Halı', 10], ['bitki', '🪴', 'Saksı', 5], ['masa', '🍽️', 'Masa', 15], ['kanepe', '🛋️', 'Kanepe', 20], ['yatak', '🛏️', 'Yatak', 25], ['kitaplik', '📚', 'Kitaplık', 25], ['tv', '📺', 'Televizyon', 30]]
+};
+const ITEM = {}; Object.values(ITEMS).flat().forEach(([k, e, n, c]) => ITEM[k] = {e, n, c});
+const working = () => !!(MYP && MYP.work_place && new Date(MYP.work_until) > Date.now());
+const meP = () => people.list.find(p => p.r && p.r.u === ME.u);
+const ownedOf = u => { const pr = PROF.get(u); return (pr && pr.owned) || []; };
+function lookFromProfile(look, pl){
+  if (!pl) return look; const o = {...look};
+  if (pl.skin != null) o.skin = pl.skin; if (pl.hair != null) o.hair = pl.hair; if (pl.hs) o.hairStyle = pl.hs;
+  if (pl.shirt != null){ o.shirt = pl.shirt; o.skirtC = pl.shirt; } if (pl.pants != null) o.pants = pl.pants; o.acc = pl.acc || ''; return o;
+}
+function colorsDirty(){ for (const k in people.parts) if (people.parts[k].instanceColor) people.parts[k].instanceColor.needsUpdate = true; }
+function applyWork(p){
+  const pr = PROF.get(p.r.u), act = pr && pr.work_place && ROOMS[pr.work_place] && new Date(pr.work_until) > Date.now();
+  if (act && p.worker !== pr.work_place){
+    const Rm = ROOMS[pr.work_place]; p.worker = pr.work_place; p.room = pr.work_place; p.sit = null; p.q = []; p.pi = 0; p.yb = 0.3;
+    p.wpath = Rm.keeper.path.map(([a, b]) => [Rm.x + a + 0.4, Rm.z + b + 1.0]);
+    p.pos.set(p.wpath[0][0], 0, p.wpath[0][1]); p.tgt.copy(p.pos); p.wait = 0.5;
+  } else if (!act && p.worker){
+    p.worker = null; p.wpath = null; p.room = null; p.q = []; p.pos.copy(p.home); p.tgt.copy(p.home); p.wait = 0.5;
+  }
+}
+async function loadProfiles(){
+  if (!(await sbP)) return;
+  try { const {data, error} = await sb.from('profiles').select('u,look,owned,work_place,work_until'); if (error) return; (data || []).forEach(r => PROF.set(r.u, r)); } catch(e){ return; }
+  people.list.forEach((p, i) => { if (!p.r) return; const pr = PROF.get(p.r.u); if (!pr) return; if (pr.look){ p.look = lookFromProfile(p.look, pr.look); setLook(i, p.look); } applyWork(p); });
+  colorsDirty(); buildDeco();
+}
+async function refreshStatus(){
+  try {
+    const {data} = await sb.rpc('my_status'); if (!data) return; MYP = data;
+    if (data.daily){ const {data: d} = await sb.rpc('daily_bonus'); if (d && d.ok){ MYP.coins = d.coins; setTimeout(() => toast('🎁 Günlük giriş hediyesi: +2 coin', 3200), 1200); } }
+    const pr = PROF.get(ME.u) || {u: ME.u}; Object.assign(pr, {look: MYP.look || pr.look, owned: MYP.owned || [], work_place: MYP.work_place, work_until: MYP.work_until}); PROF.set(ME.u, pr);
+    const p = meP(); if (p){ applyWork(p); if (MYP.look && !edState){ p.look = lookFromProfile(p.look, MYP.look); setLook(people.list.indexOf(p), p.look); colorsDirty(); } }
+  } catch(e){}
+  updateMeUI(); updateWorkbar();
+}
+let wasWorking = false;
+function updateWorkbar(){
+  const wb = $('workbar');
+  if (working()){
+    const ms = new Date(MYP.work_until) - Date.now(), m = Math.floor(ms / 60000), sec = Math.floor(ms / 1000) % 60;
+    $('worktxt').innerHTML = `💼 ${LOC[MYP.work_place]} çalışıyorsun · <b>${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}</b>`;
+    wb.classList.add('show'); wasWorking = true;
+  } else {
+    wb.classList.remove('show');
+    if (wasWorking){ wasWorking = false; if (MYP && MYP.work_place){ MYP.work_place = null; toast('💼 İş bitti! +10 coin kazandın 🎉', 3500); setTimeout(refreshMe, 1500); } }
+  }
+}
+setInterval(updateWorkbar, 1000);
+async function startWork(place){
+  if (!ME.u){ toast('Çalışmak için önce evini sahiplen 🔑 (kendi adını ara)', 3500); return; }
+  if (working()){ toast(MYP.work_place === place ? 'Zaten burada çalışıyorsun 💼' : 'Zaten çalışıyorsun 💼'); if (MYP.work_place === place) enterRoom(place); return; }
+  try {
+    const {data, error} = await sb.rpc('start_work', {p_place: place}); if (error) throw error;
+    if (!data.ok){ toast({zaten_calisiyor: 'Zaten çalışıyorsun 💼', once_sahiplen: 'Önce evini sahiplen 🔑'}[data.err] || 'Olmadı, tekrar dene'); return; }
+    MYP.work_place = place; MYP.work_until = data.work_until;
+    const pr = PROF.get(ME.u) || {u: ME.u}; pr.work_place = place; pr.work_until = data.work_until; PROF.set(ME.u, pr);
+    const p = meP(); if (p){ p.sit = null; applyWork(p); }
+    toast(`💼 ${LOC[place]} işe başladın! 1 saat sonra +10 coin. Siteden çıkabilirsin.`, 4200); updateWorkbar(); enterRoom(place);
+  } catch(e){ toast('Bağlantı sorunu, tekrar dene'); }
+}
+async function stopWork(){
+  try { const {data} = await sb.rpc('stop_work'); if (data && data.ok){ MYP.coins = data.coins; toast(`İşi bıraktın: +${data.earned} coin`); } } catch(e){}
+  wasWorking = false; MYP.work_place = null; MYP.work_until = null; const pr = PROF.get(ME.u); if (pr){ pr.work_place = null; pr.work_until = null; }
+  if (inside && inside !== 'Ev') exitRoom();
+  const p = meP(); if (p) applyWork(p); updateWorkbar(); updateMeUI();
+}
+// karakter duzenleyici
+let edState = null;
+function edRestore(){ if (!edState) return; const {p, orig} = edState; edState = null; p.look = orig; setLook(people.list.indexOf(p), orig); colorsDirty(); }
+function showEditor(){
+  const p = meP(); if (!p){ toast('Önce evini sahiplen 🔑'); return; }
+  if (working()){ toast('Çalışırken karakterini değiştiremezsin 💼'); return; }
+  edRestore();
+  const base = MYP && MYP.look, L = p.look;
+  const E = {skin: L.skin, hair: L.hair, hs: L.hairStyle, shirt: L.shirt, pants: L.pants, acc: L.acc || '', ...(base || {})};
+  const orig = {...L}; edState = {p, orig};
+  const free = !base || !(MYP && MYP.edits > 0), owned = ownedOf(ME.u);
+  const hex = c => '#' + Number(c).toString(16).padStart(6, '0');
+  const sw = (k, list) => `<div class="sw" data-k="${k}">${list.map(c => `<button class="btn${E[k] === c ? ' on' : ''}" data-v="${c}" style="background:${hex(c)}"></button>`).join('')}</div>`;
+  const tx = (k, list) => `<div class="sw" data-k="${k}">${list.map(([v, t]) => `<button class="btn t${E[k] === v ? ' on' : ''}" data-v="${v}">${t}</button>`).join('')}</div>`;
+  const accs = [['', 'Yok'], ...ITEMS.kiyafet.map(([k, e, n, c]) => [k, owned.includes(k) ? e + ' ' + n : '🔒 ' + n + ' · ' + c])];
+  openCard(`<h2>👤 Karakterim</h2><p id="edcost"></p>
+  <div class="lbl">Ten rengi</div>${sw('skin', SKINS)}<div class="lbl">Saç rengi</div>${sw('hair', HAIRS)}
+  <div class="lbl">Saç modeli</div>${tx('hs', [['S', 'Kısa'], ['L', 'Uzun'], ['-', 'Kel']])}
+  <div class="lbl">Üst (ücretsiz)</div>${sw('shirt', CLOTH)}<div class="lbl">Alt (ücretsiz)</div>${sw('pants', CLOTH)}
+  <div class="lbl">Aksesuar</div>${tx('acc', accs)}
+  <div class="row"><button class="pri btn" id="edsave">Kaydet</button><button class="sec btn" id="edshop">🛍️ Mağaza</button></div>`);
+  const cost = () => free ? 0 : (base && (E.skin !== base.skin || E.hair !== base.hair || E.hs !== base.hs) ? 10 : 0);
+  const info = () => { $('edcost').innerHTML = free ? 'İlk düzenleme <b>ücretsiz</b> 🎉 Sonra ten ve saç değişikliği 10 coin, kıyafet renkleri hep ücretsiz.' : `Ten/saç değişikliği <b>10 coin</b>, kıyafet renkleri ücretsiz. Bu kayıt: <b>${cost()} coin</b> · Sende: 🪙 ${MYP ? MYP.coins : 0}`; };
+  const preview = () => { p.look = lookFromProfile(orig, E); setLook(people.list.indexOf(p), p.look); colorsDirty(); };
+  document.querySelectorAll('#cardbody .sw').forEach(g => g.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const k = g.dataset.k, v = b.dataset.v;
+    if (k === 'acc' && v && !owned.includes(v)){ edRestore(); showShop('kiyafet'); return; }
+    E[k] = (k === 'hs' || k === 'acc') ? v : Number(v);
+    g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); preview(); info();
+  }));
+  info(); preview();
+  const i = people.list.indexOf(p); flyTo(p.pos.x, p.pos.z, 9, 7, 1200, p.r.lot.ry); p.wait = Math.max(p.wait, 20);
+  $('edshop').onclick = () => { edRestore(); showShop('kiyafet'); };
+  $('edsave').onclick = async () => {
+    try {
+      const {data, error} = await sb.rpc('save_look', {p_look: E}); if (error) throw error;
+      if (!data.ok){ toast({coin_yetmez: `Coin yetmiyor: ${data.need} coin lazım. Fırın ya da Kahvehane'de çalış 💼`, esya_yok: 'Bu aksesuar sende yok', once_sahiplen: 'Önce evini sahiplen'}[data.err] || 'Olmadı', 3500); return; }
+      MYP.look = {...E}; MYP.edits = (MYP.edits || 0) + 1; MYP.coins = data.coins; const pr = PROF.get(ME.u) || {u: ME.u}; pr.look = MYP.look; PROF.set(ME.u, pr);
+      edState = null; $('card').classList.remove('show'); updateMeUI(); react(i, false); toast(data.cost ? `Kaydedildi (-${data.cost} coin) ✨` : 'Yeni görünüm kaydedildi ✨');
+    } catch(e){ toast('Bağlantı sorunu'); }
+  };
+}
+// magaza
+function showShop(tab = 'kiyafet'){
+  if (!ME.u){ toast('Mağaza için önce evini sahiplen 🔑 (kendi adını ara)', 3500); return; }
+  const owned = ownedOf(ME.u), T = {kiyafet: '👕 Kıyafet', dis: '🌳 Bahçe', ic: '🛋️ Ev içi'};
+  openCard(`<h2>🛍️ Mağaza</h2><p>Sende 🪙 <b>${MYP ? MYP.coins : 0}</b> coin. Fırın ya da Kahvehane'de 1 saat çalış: +10 coin. Her gün girişte +2.</p>
+  <div class="seg">${Object.entries(T).map(([k, t]) => `<button class="btn ${k === tab ? 'on' : ''}" data-t="${k}">${t}</button>`).join('')}</div>
+  <div class="grid">${ITEMS[tab].map(([k, e, n, c]) => `<button class="btn it ${owned.includes(k) ? 'own' : ''}" data-i="${k}"><b>${e}</b>${n}<br><small>${owned.includes(k) ? '✓ Senin' : '🪙 ' + c}</small></button>`).join('')}</div>
+  ${tab === 'kiyafet' ? '<div class="row"><button class="sec btn" id="toed">👤 Karakterime giy</button></div>' : tab === 'ic' ? '<div class="row"><button class="sec btn" id="toev">🏠 Evime gir</button></div>' : ''}`);
+  document.querySelectorAll('#cardbody .seg button').forEach(b => b.onclick = () => showShop(b.dataset.t));
+  if ($('toed')) $('toed').onclick = () => showEditor();
+  if ($('toev')) $('toev').onclick = () => enterHouse(ME.u);
+  document.querySelectorAll('#cardbody .it').forEach(b => b.onclick = async () => {
+    const k = b.dataset.i; if (owned.includes(k)){ toast(tab === 'kiyafet' ? 'Senin! Karakterim bölümünden giyebilirsin' : 'Bu zaten senin ✓'); return; }
+    try {
+      const {data, error} = await sb.rpc('buy_item', {p_item: k}); if (error) throw error;
+      if (!data.ok){ toast({coin_yetmez: `Coin yetmiyor: ${data.need} lazım. Çalışarak kazan 💼`, zaten: 'Bu zaten senin'}[data.err] || 'Olmadı', 3500); return; }
+      MYP.coins = data.coins; MYP.owned = data.owned; const pr = PROF.get(ME.u) || {u: ME.u}; pr.owned = data.owned; PROF.set(ME.u, pr);
+      toast(`${ITEM[k].e} ${ITEM[k].n} senin oldu!`); updateMeUI(); if (tab === 'dis') buildDeco(); showShop(tab);
+    } catch(e){ toast('Bağlantı sorunu'); }
+  });
+}
+// bahce susleri
+let decoMesh = null, decoFlags = [];
+function buildDeco(){
+  if (decoMesh){ scene.remove(decoMesh); decoMesh.geometry.dispose(); decoMesh = null; } decoFlags.forEach(removeFlag); decoFlags = [];
+  const B = new Bake();
+  residents.forEach(r => {
+    const own = ownedOf(r.u), L = r.lot; if (!own.length || !L || L.owner !== r.idx || !L.h) return;
+    const bd = -L.h.d / 2; B.frame(L.x, L.z, L.ry);
+    if (own.includes('cicek')) for (let k = 0; k < 7; k++){ const u = -LW / 2 + 0.5 + k * 0.42; if (Math.abs(u - L.h.dx) < 0.9) continue; B.box(0.06, 0.3, 0.06, 0x3f7a40, u, 0.5, FZ - 0.5); B.ico(0.14, [0xe24f4f, 0xf4c542, 0xf3a0c0, 0xffffff, 0xb07ad8][k % 5], u, 0.7, FZ - 0.5); }
+    if (own.includes('bank')){ const bx = L.h.dx > 0 ? -2.3 : 2.3; B.box(1.4, 0.08, 0.45, 0x8a6347, bx, 0.75, FZ - 1.3); B.box(1.4, 0.4, 0.06, 0x8a6347, bx, 1.0, FZ - 1.5); for (const sd of [-0.6, 0.6]) B.box(0.06, 0.4, 0.4, 0x2a2a30, bx + sd, 0.55, FZ - 1.3); }
+    if (own.includes('fener')){ const fx = L.h.dx > 0 ? -3.4 : 3.4; B.cyl(0.05, 0.07, 1.8, 6, 0x2a2230, fx, 1.2, FZ - 0.4); B.box(0.3, 0.36, 0.3, 0xffe3a0, fx, 2.2, FZ - 0.4); }
+    if (own.includes('agac')){ B.cyl(0.14, 0.18, 1.6, 6, 0x6b4a32, -2.8, 1.1, bd - 1.3); B.ico(1.05, 0x4f8a45, -2.8, 2.6, bd - 1.3, 1.1); }
+    if (own.includes('cesme')){ B.cyl(0.7, 0.8, 0.4, 12, 0xd8ccb6, 2.7, 0.5, bd - 1.3); B.cyl(0.58, 0.58, 0.05, 12, 0x6fc6d0, 2.7, 0.72, bd - 1.3); B.cyl(0.1, 0.12, 0.8, 8, 0xd8ccb6, 2.7, 0.9, bd - 1.3); B.ico(0.18, 0x9fe0ea, 2.7, 1.35, bd - 1.3); }
+    if (own.includes('havuz')){ B.box(2.3, 0.2, 1.5, 0xe8e0d0, 0, 0.4, bd - 1.35); B.box(2.0, 0.05, 1.2, 0x3fb6d8, 0, 0.52, bd - 1.35); }
+    if (own.includes('bayrak')){ const px = L.h.dx > 0 ? -3.1 : 3.1; B.cyl(0.05, 0.06, 4.6, 6, 0xdddddd, px, 2.6, FZ - 0.9); const [fx, fz] = lw(L, px, FZ - 0.9); decoFlags.push(makeFlag(fx, 4.85, fz, 1.2, L.ry + Math.PI / 2)); }
+  });
+  B.reset(); decoMesh = B.build(VC(), true, true); renderer.shadowMap.needsUpdate = true;
+}
+// ev ici
+let furn = null;
+function enterHouse(u){
+  if (working()){ toast('Çalışırken evine giremezsin. Önce işi bırak 💼'); return; }
+  const p = people.list.find(q => q.r && q.r.u === u); if (!p) return;
+  const Rm = ROOMS.Ev, own = ownedOf(u), B = new Bake(); B.frame(Rm.x, Rm.z, 0);
+  if (furn){ scene.remove(furn); furn.geometry.dispose(); furn = null; }
+  if (own.includes('hali')){ B.box(4.4, 0.03, 3.0, 0xb5452a, 0.8, 0.32, -1.9); B.box(3.8, 0.035, 2.4, 0xd9a35f, 0.8, 0.33, -1.9); }
+  if (own.includes('kanepe')){ B.box(3.0, 0.5, 1.0, 0x3d6aa8, 0.8, 0.6, -0.4); B.box(3.0, 0.8, 0.3, 0x335c93, 0.8, 1.15, -0.05); for (const sd of [-1.6, 1.6]) B.box(0.3, 0.75, 1.0, 0x335c93, 0.8 + sd, 0.75, -0.4); }
+  if (own.includes('tv')){ B.box(2.4, 0.5, 0.5, 0x6b4a3a, 0.8, 0.55, -4.1); B.box(2.2, 1.25, 0.08, 0x1a1a1f, 0.8, 1.55, -4.2); B.pl(2.0, 1.1, 0x3f8fbf, 0.8, 1.55, -4.15); }
+  if (own.includes('yatak')){ B.box(2.0, 0.5, 3.2, 0x8a6347, -4.6, 0.55, 0.6); B.box(1.9, 0.18, 3.0, 0xf2f2f2, -4.6, 0.88, 0.6); B.box(1.9, 0.12, 2.0, 0x8e5ac8, -4.6, 1.0, 1.1); B.box(1.4, 0.2, 0.5, 0xffffff, -4.6, 1.05, -0.65); B.box(2.0, 1.0, 0.12, 0x6b4a3a, -4.6, 1.0, -1.0); }
+  if (own.includes('kitaplik')){ B.box(2.0, 2.6, 0.6, 0x8a6347, 4.5, 1.6, -4.1); for (let y = 0; y < 4; y++){ B.box(1.8, 0.05, 0.5, 0x6b4a3a, 4.5, 0.6 + y * 0.6, -4.05); for (let k = 0; k < 7; k++) B.box(0.18, 0.42, 0.4, [0xc23b3b, 0x3d6aa8, 0xf4c542, 0x5d7f5a, 0x8e5ac8][(k + y) % 5], 3.75 + k * 0.24, 0.85 + y * 0.6, -4.0); } }
+  if (own.includes('masa')){ B.box(1.8, 0.08, 1.0, 0xc9a27a, -2.6, 1.1, 3.0); for (const [a, b] of [[-0.8, -0.4], [0.8, -0.4], [-0.8, 0.4], [0.8, 0.4]]) B.box(0.08, 0.8, 0.08, 0x6b4a3a, -2.6 + a, 0.7, 3.0 + b); B.box(0.25, 0.3, 0.25, 0xf2efe6, -2.6, 1.3, 3.0); }
+  if (own.includes('bitki')) for (const [a, b] of [[5.3, 3.6], [-5.3, -3.6]]){ B.cyl(0.32, 0.25, 0.55, 8, 0xc1704a, a, 0.6, b); B.ico(0.55, 0x4f8a45, a, 1.25, b, 1.2); }
+  furn = B.build(VC(), false, true);
+  Rm.ox = p.r.lot.x; Rm.oz = p.r.lot.z; Rm.ory = p.r.lot.ry;
+  Rm.title = `🏠 @${u}'nun evi${own.some(k => ITEMS.ic.find(x => x[0] === k)) ? '' : ' · boş'}`;
+  enterRoom('Ev');
+  if (u === ME.u && !own.some(k => ITEMS.ic.find(x => x[0] === k))) setTimeout(() => toast('Evin boş! Mağazadan eşya al 🛋️', 3000), 1600);
+}
+ROOMS.Ev.seats.forEach(st => { st.x = ROOMS.Ev.x + st.lx; st.z = ROOMS.Ev.z + st.lz; st.y = 0.88; });
+// begeni + haftanin evi
+async function doLike(p){
+  if (!ME.u){ toast('Beğenmek için önce evini sahiplen 🔑'); return; }
+  if (working()){ toast('Çalışırken beğeni yapamazsın 💼'); return; }
+  try { const {data, error} = await sb.rpc('like_house', {p_u: p.r.u}); if (error) throw error;
+    toast({tamam: `❤️ @${p.r.u}'nun evini beğendin`, zaten: 'Bu hafta zaten beğendin ❤️', kendin: 'Kendi evini beğenemezsin 😄', once_sahiplen: 'Önce evini sahiplen'}[data] || 'Olmadı'); if (data === 'tamam'){ p.jump = 0.55; bubble(p, 'Teşekkürler! ❤️'); }
+  } catch(e){ toast('Bağlantı sorunu'); }
+}
+async function showTop(){
+  if (!(await sbP)){ toast('Sunucuya ulaşılamadı'); return; }
+  const {data} = await sb.rpc('top_houses'); const list = data || [];
+  openCard(`<h2>🏆 Haftanın en güzel evi</h2><p>Komşuların evine gir, beğendiysen ❤️ bas. Her pazartesi yeni hafta başlar.</p>
+  ${list.length ? `<ul class="nl">${list.map((x, k) => `<li>${['🥇', '🥈', '🥉'][k] || (k + 1) + '.'} <b>@${esc(x.u)}</b> · ❤️ ${x.n} <button class="btn sec" style="float:right;border-radius:9px;padding:4px 10px" data-u="${esc(x.u)}">Git</button></li>`).join('')}</ul>` : '<p>Bu hafta henüz beğeni yok. İlk beğeniyi sen yap!</p>'}`);
+  document.querySelectorAll('#cardbody .nl button').forEach(b => b.onclick = () => findUser(b.dataset.u));
+}
+// arama kisayollari
+function goHome(){ const me = getMe(); if (me) findUser(me); else toast('Önce kendi kullanıcı adını arayıp evini sahiplen 🔑', 3500); }
+function showQuick(){
+  const q = $('quick'), me = getMe(); q.innerHTML = '';
+  const add = (t, f) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = t; b.addEventListener('pointerdown', e => { e.preventDefault(); q.classList.remove('show'); $('q').blur(); f(); }); q.appendChild(b); };
+  add('🏠 Evime git', goHome);
+  if (ME.u){ add('👤 Karakterim', showEditor); add('🛍️ Mağaza', () => showShop()); }
+  add('🥖 Fırın', () => flyTo(...landmarks['Fırın'], 30, 22)); add('☕ Kahvehane', () => flyTo(...landmarks['Kahvehane'], 30, 22));
+  add('🚆 Gar', () => flyTo(...landmarks['Gar'], 36, 26)); add('🌳 Park', () => flyTo(...landmarks['Park'], 34, 24));
+  add('🏆 Haftanın evi', showTop);
+  $('card').classList.remove('show'); q.classList.add('show');
+}
+// gar: yeni gelenler merdivenden cikar
+function startArrival(){
+  let seen = null; try { seen = localStorage.getItem('ms_seen'); } catch(e){}
+  const maxIdx = Math.max(-1, ...residents.map(r => r.idx));
+  try { localStorage.setItem('ms_seen', String(maxIdx)); } catch(e){}
+  const forced = params.has('gar');
+  if (seen === null && !forced) return;
+  const news = people.list.filter(p => p.r && !p.founder && (forced ? p.r.idx >= maxIdx - 3 : p.r.idx > +seen)).slice(-6); if (!news.length) return;
+  const {cx, cz} = STATION, Lz = LINES.reduce((a, b) => Math.abs(b - (cz - 13)) < Math.abs(a - (cz - 13)) ? b : a), PT = 1.3;
+  news.forEach((p, k) => {
+    const sx = k % 2 ? 6 : -6, hx = p.home.x, hz = p.home.z;
+    const Xv = LINES.reduce((a, b) => Math.abs(b - hx) < Math.abs(a - hx) ? b : a), sg = Math.sign(hx - Xv) || 1, ex = Xv + sg * 3.6, ez = Lz + 3.6;
+    p.pos.set(cx + sx, 0, cz - 8.7); p.yb = 0.3; p.inG = false; p.arriving = true; p.speed = 2.3; p.wait = k * 1.6; p.sit = null;
+    p.q = [{x: cx + sx, z: cz - 4.6, y: PT}, {x: cx, z: cz - 4.6, y: PT}, {x: cx, z: cz - 10.9, y: PT}, {x: cx, z: cz - 12.9, y: 0.3}, {x: cx, z: ez, y: 0.3}, {x: ex, z: ez, y: 0.3}, {x: ex, z: hz, y: 0.3}, {x: hx, z: hz, y: 0.3}];
+    newTarget(p);
+  });
+  setTimeout(() => toast(`🚆 ${news.length} yeni komşu trenle geldi! Gar'a bak`, 4000), 2500);
 }
 
 // ---------- sunucu: sahiplenme, kapi, bildirim, yonetim ----------
@@ -846,11 +1290,12 @@ async function ensureSession(){
 async function refreshMe(){
   if (!sb) return;
   try { const {data} = await sb.rpc('whoami'); if (data){ ME = data; if (ME.u){ try { localStorage.setItem('bs_me', ME.u); } catch(e){} } } } catch(e){}
-  updateMeUI();
+  if (ME.u) await refreshStatus(); else updateMeUI();
 }
 function updateMeUI(){
   const box = $('mechips'); box.innerHTML = '';
   if (ME.u){ const b = document.createElement('button'); b.className = 'chip btn'; b.innerHTML = `🏠 @${esc(ME.u)}${ME.unseen ? ' · 🔔 ' + ME.unseen : ''}`; b.onclick = () => { findUser(ME.u); if (ME.unseen) setTimeout(showNotifs, 1900); }; box.appendChild(b); }
+  if (ME.u){ const c = document.createElement('button'); c.className = 'chip btn coin'; c.innerHTML = `🪙 <b>${MYP ? MYP.coins : '…'}</b> coin`; c.onclick = () => showShop(); box.appendChild(c); }
   if (ME.admin){ const a = document.createElement('button'); a.className = 'chip btn'; a.textContent = '⚙️ Yönetim'; a.onclick = showAdmin; box.appendChild(a); }
 }
 function showClaim(p){
@@ -885,6 +1330,7 @@ function showPrivacy(back){
   $('bk').onclick = back;
 }
 async function doKnock(p){
+  if (working()){ toast('Çalışırken kapı çalamazsın 💼'); return; }
   if (!ME.u){ toast('Kapı çalmak için önce kendi evini sahiplen: kendi kullanıcı adını ara 🔑', 3500); return; }
   try {
     const {data, error} = await sb.rpc('knock', {p_to: p.r.u}); if (error) throw error;
@@ -895,8 +1341,8 @@ async function doKnock(p){
 const ago = t => { const m = Math.round((Date.now() - new Date(t)) / 60000); return m < 1 ? 'şimdi' : m < 60 ? m + ' dk önce' : m < 1440 ? Math.round(m / 60) + ' saat önce' : Math.round(m / 1440) + ' gün önce'; };
 async function showNotifs(){
   if (!sb || !ME.u) return;
-  const {data} = await sb.from('events').select('from_u,kind,created_at,seen').eq('to_u', ME.u).order('created_at', {ascending: false}).limit(30);
-  const items = (data || []).map(e => `<li>${e.seen ? '' : '🟠 '}${e.kind === 'knock' ? `<b>@${esc(e.from_u)}</b> kapını çaldı 🚪` : esc(e.kind)}<br><small>${ago(e.created_at)}</small></li>`).join('');
+  const {data} = await sb.from('events').select('from_u,kind,created_at,seen,data').eq('to_u', ME.u).order('created_at', {ascending: false}).limit(30);
+  const items = (data || []).map(e => `<li>${e.seen ? '' : '🟠 '}${e.kind === 'knock' ? `<b>@${esc(e.from_u)}</b> kapını çaldı 🚪` : e.kind === 'work_done' ? `💼 İşin bitti: <b>+${(e.data && e.data.coins) || 10} coin</b> kazandın` : esc(e.kind)}<br><small>${ago(e.created_at)}</small></li>`).join('');
   openCard(`<h2>🔔 Bildirimler</h2>${items ? `<ul class="nl">${items}</ul>` : '<p>Henüz bildirim yok. Komşuların kapını çaldığında burada görünecek.</p>'}`);
   if ((data || []).some(e => !e.seen)){ await sb.from('events').update({seen: true}).eq('to_u', ME.u).eq('seen', false); ME.unseen = 0; updateMeUI(); }
 }
@@ -919,7 +1365,9 @@ async function showAdmin(){
   <h3>Sakin yönet</h3><input class="f" id="mu" placeholder="@kullanıcıadı" autocapitalize="off">
   <div class="row"><button class="sec btn" id="mgo">Evine git</button><button class="sec btn" id="mban">Engelle</button></div>
   <div class="row"><button class="sec btn" id="munban">Engeli kaldır</button><button class="sec btn" id="mreset">Sahipliği sıfırla</button></div>
+  <div class="row"><input class="f" id="mcn" type="number" inputmode="numeric" value="50" style="flex:1;margin:0"><button class="sec btn" id="mcoin">🪙 Coin ver</button></div>
   <div class="row"><button class="sec btn" id="alogout">Çıkış</button></div></div>`);
+  $('mcoin').onclick = async () => { const u = mu(); if (!u) return; const {data, error} = await sb.rpc('admin_coins', {p_u: u, p_n: parseInt($('mcn').value) || 0}); toast(error || data === null ? 'Olmadı' : `@${u} artık ${data} coin`); };
   document.querySelectorAll('.seg button').forEach(b => b.onclick = async () => {
     const m = b.dataset.m; const {error} = await sb.from('settings').upsert({key: 'time_mode', value: m});
     if (error){ toast('Kaydedilemedi'); return; } SETTINGS.time_mode = m; updateSky(); toast('Saat ayarı herkes için güncellendi'); showAdmin();
@@ -945,18 +1393,23 @@ async function initServer(){
   if (params.has('yonetici') && !ME.admin) showAdminLogin();
   setInterval(() => { if (ME.u && !document.hidden) refreshMe(); }, 60000);
 }
-$('cx').onclick = () => $('card').classList.remove('show');
+$('cx').onclick = () => { edRestore(); $('card').classList.remove('show'); };
 $('go').onclick = () => findUser($('q').value);
 $('q').addEventListener('keydown', e => { if (e.key === 'Enter'){ $('q').blur(); findUser($('q').value); } });
+$('q').addEventListener('focus', showQuick);
+$('q').addEventListener('blur', () => setTimeout(() => $('quick').classList.remove('show'), 150));
+$('workgo').onclick = () => { if (working()) enterRoom(MYP.work_place); };
+$('workstop').onclick = () => { const b = $('workstop'); if (b.dataset.sure){ delete b.dataset.sure; b.textContent = 'Bırak'; stopWork(); } else { b.dataset.sure = 1; b.textContent = 'Emin misin?'; setTimeout(() => { delete b.dataset.sure; b.textContent = 'Bırak'; }, 3000); } };
 $('regbtn').onclick = () => $('menu').classList.toggle('open');
 function buildMenu(){
   const m = $('menu');
   Object.entries(landmarks).forEach(([k, [x, z]]) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = k; b.onclick = () => { m.classList.remove('open'); flyTo(x, z, 34, 24); }; m.appendChild(b); });
+  const tp = document.createElement('button'); tp.className = 'btn'; tp.textContent = '🏆 Haftanın evi'; tp.onclick = () => { m.classList.remove('open'); showTop(); }; m.appendChild(tp);
   const all = document.createElement('button'); all.className = 'btn'; all.textContent = 'Tüm mahalle'; all.onclick = () => { m.classList.remove('open'); flyTo(0, 10, 170, 150, 1800); }; m.appendChild(all);
 }
 
 // ---------- sinema modu (video cekimi icin) ----------
-window.cine = { showAdmin, showClaim, flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
+window.cine = { showEditor, showShop, startWork, enterHouse, showTop, startArrival, houseTag, buildDeco, PROF, STATION, VEH, lots, residents: () => residents, setMe(o){ ME = o.ME || ME; MYP = o.MYP || MYP; updateMeUI(); updateWorkbar(); }, showAdmin, showClaim, flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
 
 // ---------- dongu ----------
 function resize(){ const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.8 ? 48 : 38; camera.updateProjectionMatrix(); }
@@ -964,11 +1417,14 @@ addEventListener('resize', resize); resize();
 camera.position.set(110, 150, 230); controls.target.set(0, 0, 10);
 buildMenu();
 await loadResidents();
-updateSky(); setInterval(updateSky, 30000); initServer();
+startArrival();
+updateSky(); setInterval(updateSky, 30000); setInterval(drawClock, 30000); initServer().then(loadProfiles);
 let last = performance.now(), fpsN = 0, fpsT = 0;
 function loop(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   updateFly(); controls.update(); updatePeople(dt, now);
+  const ts = now / 1000; updateTraffic(dt, ts); updateLights(ts); updateFlags(ts);
+  if (htag){ htag.t -= dt; htag.s.material.opacity = Math.min(1, htag.t); if (htag.t <= 0){ scene.remove(htag.s); htag = null; } }
   if ((lblT += dt) > 0.25){ lblT = 0; updateLabels(); }
   roomChatter(dt);
   renderer.render(scene, camera); requestAnimationFrame(loop);
