@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Bizim Sokak</title>
+<meta name="description" content="Bizim Sokak: @bizimsokak.tr takipçilerinin yaşadığı küçük 3D mahalle. Kullanıcı adını yaz, evini bul.">
+<meta property="og:title" content="Bizim Sokak — Herkese bir ev">
+<meta property="og:description" content="Takip et, yorumlara 'ev' yaz, mahalleye taşın.">
+<meta name="theme-color" content="#f3ead8">
+<style>
+:root{--ink:#2a2230;--paper:#fbf7ef;--accent:#ff8a2a;--muted:#8a8090;--glass:rgba(251,247,239,.86)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#f3ead8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--ink)}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:fixed;top:max(10px,env(safe-area-inset-top));right:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:5;pointer-events:none}
+.chip{background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:auto}
+.chip b{font-variant-numeric:tabular-nums}
+.btn{border:0;cursor:pointer;font:inherit}
+.brand{position:fixed;top:max(10px,env(safe-area-inset-top));left:10px;z-index:5;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.brand h1{margin:0;font-size:15px;letter-spacing:.2px}
+.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.goal{margin-top:6px;width:170px}
+.bar{height:6px;border-radius:6px;background:rgba(0,0,0,.08);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:6px;width:0}
+.goal span{font-size:10.5px;color:var(--muted);display:block;margin-top:4px}
+#menu{display:none;flex-direction:column;gap:4px;margin-top:2px}
+#menu.open{display:flex}
+#menu button{background:var(--glass);border-radius:9px;padding:7px 11px;font-size:12px;font-weight:600;text-align:right;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.find{position:fixed;left:10px;right:10px;bottom:max(12px,env(safe-area-inset-bottom));z-index:6;display:flex;gap:8px;max-width:460px;margin:0 auto}
+.find input{flex:1;min-width:0;border:0;border-radius:14px;padding:13px 14px;font-size:16px;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 2px 14px rgba(0,0,0,.12);color:var(--ink);outline:none}
+.find button{border-radius:14px;padding:0 18px;font-weight:700;background:var(--ink);color:#fff;font-size:15px}
+#card{position:fixed;left:10px;right:10px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 62px);z-index:7;max-width:460px;margin:0 auto;background:var(--paper);border-radius:18px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.22);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}
+#card.show{transform:none;opacity:1;pointer-events:auto}
+#card h2{margin:0 0 2px;font-size:18px}
+#card p{margin:4px 0;color:#5b5262;font-size:13.5px;line-height:1.4}
+#card .x{position:absolute;right:10px;top:8px;background:none;font-size:20px;color:var(--muted)}
+.locks{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.locks div{background:#f0e9dc;border-radius:10px;padding:8px;font-size:12px;font-weight:600;color:#7a7080}
+.locks div:before{content:"🔒 "}
+.row{display:flex;gap:8px;margin-top:8px}
+.row a,.row button{flex:1;text-align:center;border-radius:12px;padding:11px;font-weight:700;font-size:14px;text-decoration:none}
+.pri{background:var(--accent);color:#fff}.sec{background:#efe7d8;color:var(--ink)}
+#toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(42,34,48,.92);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:80%}
+#toast.show{opacity:1}
+#load{position:fixed;inset:0;background:#f3ead8;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
+#load h1{margin:0;font-size:34px;letter-spacing:.5px}
+#load p{margin:0;color:var(--muted);font-size:14px}
+#load.hide{opacity:0;pointer-events:none}
+body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="load"><h1>Bizim Sokak</h1><p>Mahalle uyanıyor…</p></div>
+<div class="brand"><h1>Bizim Sokak</h1><small>@bizimsokak.tr · herkese bir ev</small>
+  <div class="goal"><div class="bar"><i id="goalbar"></i></div><span id="goaltxt">Ev sahipliği 1000 takipçide açılıyor</span></div></div>
+<div class="hud">
+  <div class="chip">Nüfus: <b id="pop">0</b></div>
+  <div class="chip"><span id="day">Gün 1</span> · <b id="clock">00:00</b></div>
+  <button class="chip btn" id="regbtn">Bölgeler ▾</button>
+  <div id="menu"></div>
+</div>
+<div class="find"><input id="q" placeholder="Sakini bul: @kullanıcıadı" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" id="go">Bul</button></div>
+<div id="card"><button class="x btn" id="cx">×</button><div id="cardbody"></div></div>
+<div id="toast"></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const START = new Date('2026-11-11T00:00:00+03:00');
+const IG = 'https://www.instagram.com/bizimsokak.tr/';
+const GOAL = 1000;
+const params = new URLSearchParams(location.search);
+const CINE = params.has('cine');
+if (CINE) document.body.classList.add('cine');
+
+// ---------- yardimcilar ----------
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const pick = a => a[Math.floor(rnd() * a.length)];
+const $ = id => document.getElementById(id);
+function toast(t, ms = 2600){ const e = $('toast'); e.textContent = t; e.classList.add('show'); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('show'), ms); }
+const norm = s => (s || '').trim().replace(/^@+/, '').toLowerCase();
+
+// ---------- sahne ----------
+const canvas = $('c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: CINE});
+renderer.setPixelRatio(Math.min(devicePixelRatio, CINE ? 1 : 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.5, 900);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.maxPolarAngle = 1.32; controls.minDistance = 8; controls.maxDistance = 260;
+controls.screenSpacePanning = false;
+controls.touches = {ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE};
+controls.mouseButtons = {LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE};
+
+const hemi = new THREE.HemisphereLight(0xfff4e0, 0x8aa070, 1.1); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+const sc = sun.shadow.camera; sc.left = -120; sc.right = 120; sc.top = 120; sc.bottom = -120; sc.near = 1; sc.far = 400;
+sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.6;
+scene.add(sun, sun.target);
+scene.fog = new THREE.Fog(0xf3ead8, 220, 520);
+
+const M = c => new THREE.MeshLambertMaterial({color: c});
+const mats = {};
+const mat = c => mats[c] || (mats[c] = M(c));
+function box(w, h, d, color, x, y, z, ry = 0, cast = true){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
+  m.position.set(x, y, z); m.rotation.y = ry; m.castShadow = cast; m.receiveShadow = true; scene.add(m); return m;
+}
+
+// ---------- sehir plani ----------
+const BLOCK = 26, ROAD = 7, N = 7;            // 7x7 blok, ortadaki meydan
+const PITCH = BLOCK + ROAD, HALF = (N * PITCH) / 2;
+const blockCenter = (i, j) => [-HALF + ROAD / 2 + BLOCK / 2 + i * PITCH, -HALF + ROAD / 2 + BLOCK / 2 + j * PITCH];
+const SEA_Z = HALF + 14;
+
+// zemin, deniz, kum
+box(N * PITCH + 160, 1, N * PITCH + 120, 0x9cc27a, 0, -0.5, -20, 0, false).castShadow = false;
+const sea = new THREE.Mesh(new THREE.PlaneGeometry(1200, 500), new THREE.MeshLambertMaterial({color: 0x6cc4c8}));
+sea.rotation.x = -Math.PI / 2; sea.position.set(0, 0.05, SEA_Z + 250); scene.add(sea);
+box(N * PITCH + 160, 0.4, 22, 0xf2dcae, 0, 0.1, SEA_Z, 0, false);
+// yollar
+const roadMat = 0x5d5a63;
+for (let k = 0; k <= N; k++){
+  const p = -HALF + k * PITCH + ROAD / 2 - ROAD / 2;
+  box(ROAD, 0.12, N * PITCH + ROAD, roadMat, p + ROAD / 2 - ROAD / 2 + 0, 0.06, 0, 0, false).position.x = -HALF + k * PITCH;
+  box(N * PITCH + ROAD, 0.12, ROAD, roadMat, 0, 0.065, 0, 0, false).position.z = -HALF + k * PITCH;
+}
+// serit cizgileri (instanced)
+{
+  const g = new THREE.PlaneGeometry(2.2, 0.28); const m = new THREE.MeshBasicMaterial({color: 0xf4efe2});
+  const marks = []; for (let k = 0; k <= N; k++) for (let t = -HALF + 3; t < HALF; t += 5){ marks.push([-HALF + k * PITCH, t, 0]); marks.push([t, -HALF + k * PITCH, 1]); }
+  const im = new THREE.InstancedMesh(g, m, marks.length); const o = new THREE.Object3D();
+  marks.forEach(([x, z, r], i) => { o.position.set(x, 0.14, z); o.rotation.set(-Math.PI / 2, 0, r ? 0 : Math.PI / 2); o.updateMatrix(); im.setMatrixAt(i, o.matrix); });
+  scene.add(im);
+}
+
+// ---------- yapilar ----------
+const WALLS = [0xf1e4cf, 0xf5c9a8, 0xe9a48a, 0xb9d3e3, 0xf4dc8a, 0xd8e6c4, 0xf3b9b4, 0xe8d6f0];
+const ROOFS = [0xc8553d, 0xb04632, 0x8a5a44, 0x4f6d7a, 0xd27b4f];
+const lots = [];                  // ev arsalari (merkeze yakin olan once)
+const landmarks = {};
+const houseObjs = [];
+function house(x, z, ry, w = 7, d = 7, floors = 1){
+  const h = 3.4 * floors; const wall = pick(WALLS);
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry;
+  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(wall)); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, d) * 0.78, 2.6, 4), mat(pick(ROOFS)));
+  roof.position.y = h + 1.3; roof.rotation.y = Math.PI / 4; roof.scale.set(w / Math.max(w, d), 1, d / Math.max(w, d)); roof.castShadow = true; g.add(roof);
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.1, 0.1), mat(0x6b4a3a)); door.position.set(0, 1.05, d / 2 + 0.05); g.add(door);
+  for (const s of [-1, 1]) { const wdw = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 0.1), mat(0x8fc3d8)); wdw.position.set(s * w * 0.28, h - 1.6, d / 2 + 0.05); g.add(wdw); }
+  scene.add(g); return g;
+}
+function apartment(x, z, ry, floors){
+  const w = 9, d = 9, h = 3 * floors; const wall = pick([0xf1e4cf, 0xf4dc8a, 0xe9a48a, 0xf3b9b4, 0xcfd9c0]);
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry;
+  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(wall)); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 0.5, d + 0.4), mat(0xdcd2c2)); top.position.y = h + 0.25; g.add(top);
+  const wg = new THREE.BoxGeometry(1.1, 1.3, 0.1); const wm = mat(0x7fb3cc);
+  const cnt = floors * 3 * 2; const im = new THREE.InstancedMesh(wg, wm, cnt); const o = new THREE.Object3D(); let n = 0;
+  for (let f = 0; f < floors; f++) for (let c = -1; c <= 1; c++) for (const s of [1, -1]) { o.position.set(c * 2.7, 1.6 + f * 3, s * (d / 2 + 0.05)); o.updateMatrix(); im.setMatrixAt(n++, o.matrix); }
+  g.add(im); scene.add(g); return g;
+}
+function label3d(text, x, y, z, bg = '#2a2230', fg = '#fff', size = 1){
+  const c = document.createElement('canvas'); const ctx = c.getContext('2d'); const fs = 44;
+  ctx.font = `700 ${fs}px Inter, Arial, sans-serif`; const w = Math.ceil(ctx.measureText(text).width) + 40; c.width = w; c.height = 72;
+  ctx.font = `700 ${fs}px Inter, Arial, sans-serif`; ctx.fillStyle = bg; ctx.beginPath(); ctx.roundRect(0, 0, w, 72, 18); ctx.fill();
+  ctx.fillStyle = fg; ctx.textBaseline = 'middle'; ctx.fillText(text, 20, 38);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map: t, depthTest: false, transparent: true}));
+  s.scale.set(w / 72 * 1.6 * size, 1.6 * size, 1); s.position.set(x, y, z); s.renderOrder = 10; scene.add(s); return s;
+}
+function tree(x, z, s = 1){
+  const t = box(0.6 * s, 2.2 * s, 0.6 * s, 0x7a5a3f, x, 1.1 * s, z);
+  const c = new THREE.Mesh(new THREE.IcosahedronGeometry(2.1 * s, 0), mat(pick([0x6fa35a, 0x5e9450, 0x82b866]))); c.position.set(x, 3.4 * s, z); c.castShadow = true; scene.add(c);
+}
+
+// bloklar
+const center = Math.floor(N / 2);
+for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
+  const [cx, cz] = blockCenter(i, j);
+  const kald = box(BLOCK, 0.3, BLOCK, 0xe9e2d3, cx, 0.15, cz, 0, false); // kaldirim
+  const dist = Math.max(Math.abs(i - center), Math.abs(j - center));
+  if (i === center && j === center){ // MEYDAN
+    box(BLOCK - 4, 0.36, BLOCK - 4, 0xd9cdb6, cx, 0.2, cz, 0, false);
+    const pool = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.6, 0.9, 24), mat(0xcfc3ad)); pool.position.set(cx, 0.6, cz); pool.castShadow = pool.receiveShadow = true; scene.add(pool);
+    const water = new THREE.Mesh(new THREE.CylinderGeometry(3.7, 3.7, 0.2, 24), mat(0x7cc9d3)); water.position.set(cx, 1.0, cz); scene.add(water);
+    box(0.7, 3, 0.7, 0xcfc3ad, cx, 2.2, cz);
+    for (const [a, b] of [[-8, -8], [8, -8], [-8, 8], [8, 8]]) tree(cx + a, cz + b, 1.1);
+    for (const r of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) box(3.2, 0.5, 0.9, 0x8a6347, cx + Math.sin(r) * 7, 0.6, cz + Math.cos(r) * 7, r);
+    landmarks['Meydan'] = [cx, cz]; label3d('Meydan', cx, 7, cz, '#ff8a2a');
+    continue;
+  }
+  if (i === center && j === center - 1){ // FIRIN + KAHVEHANE
+    const f = house(cx - 6, cz + 5, 0, 10, 8, 1); f.children[0].material = mat(0xf2d29b);
+    box(10.4, 0.5, 2.4, 0xc8553d, cx - 6, 3.1, cz + 9.6);
+    landmarks['Fırın'] = [cx - 6, cz + 5]; label3d('Fırın', cx - 6, 7.8, cz + 5, '#c8553d');
+    const k = house(cx + 6, cz + 5, 0, 10, 8, 1); k.children[0].material = mat(0xd8e6c4);
+    for (const s of [-3, 0, 3]) { box(1.6, 0.9, 1.6, 0x8a6347, cx + 6 + s, 0.75, cz + 11.5); }
+    landmarks['Kahvehane'] = [cx + 6, cz + 5]; label3d('Kahvehane', cx + 6, 7.8, cz + 5, '#4f6d7a');
+    continue;
+  }
+  if (i === center && j === N - 1){ // CAY BAHCESI (sahile bakan)
+    for (let a = -2; a <= 2; a++) for (let b = -1; b <= 1; b++){ box(1.8, 0.8, 1.8, 0xffffff, cx + a * 4.5, 0.7, cz + b * 5); const u = new THREE.Mesh(new THREE.ConeGeometry(2, 1, 8), mat(pick([0xff8a2a, 0xe24f4f, 0x3f8fbf]))); u.position.set(cx + a * 4.5, 3.2, cz + b * 5); u.castShadow = true; scene.add(u); box(0.15, 2.6, 0.15, 0xdddddd, cx + a * 4.5, 1.9, cz + b * 5); }
+    landmarks['Çay Bahçesi'] = [cx, cz]; label3d('Çay Bahçesi', cx, 6.5, cz, '#3f8fbf');
+    continue;
+  }
+  if (i === center - 1 && j === center){ // MUHTARLIK
+    const m = house(cx, cz, Math.PI / 2, 12, 10, 2); m.children[0].material = mat(0xf1e4cf);
+    box(0.2, 8, 0.2, 0xdddddd, cx + 8, 4, cz); box(2.4, 1.6, 0.1, 0xe30a17, cx + 9.2, 7.2, cz);
+    landmarks['Muhtarlık'] = [cx, cz]; label3d('Muhtarlık', cx, 11, cz, '#2a2230');
+    continue;
+  }
+  // konut bloklari: icte evler, kenarda apartmanlar
+  if (dist >= 3 && rnd() < 0.5){
+    for (const [a, b] of [[-6.5, -6.5], [6.5, -6.5], [-6.5, 6.5], [6.5, 6.5]]) { apartment(cx + a, cz + b, 0, 3 + Math.floor(rnd() * 5)); }
+    continue;
+  }
+  // 8 ev arsasi: blok cevresinde, kapisi yola bakar
+  const slots = [[-7.5, -9, Math.PI], [0, -9, Math.PI], [7.5, -9, Math.PI], [-7.5, 9, 0], [0, 9, 0], [7.5, 9, 0], [-9, 0, -Math.PI / 2], [9, 0, Math.PI / 2]];
+  for (const [a, b, r] of slots) lots.push({x: cx + a, z: cz + b, ry: r, d: Math.hypot(cx + a, cz + b) + rnd() * 3});
+  tree(cx, cz, 0.9);
+}
+lots.sort((a, b) => a.d - b.d);
+// sahil: iskele + cankurtaran
+box(3, 0.4, 26, 0x9a7656, 30, 0.6, SEA_Z + 16);
+box(4, 3.5, 4, 0xe24f4f, -40, 3.8, SEA_Z + 2); box(0.3, 2.2, 0.3, 0xffffff, -40, 1.1, SEA_Z + 2);
+landmarks['Sahil'] = [0, SEA_Z]; label3d('Sahil', 0, 4, SEA_Z + 4, '#3f8fbf');
+// cevre agaclari
+for (let k = 0; k < 140; k++){ const a = rnd() * Math.PI * 2, r = HALF + 18 + rnd() * 60; const x = Math.cos(a) * r, z = Math.sin(a) * r; if (z < SEA_Z - 14) tree(x, z, 0.8 + rnd() * 0.6); }
+// sokak lambalari
+{
+  const g = new THREE.CylinderGeometry(0.12, 0.12, 4.2, 6); const h = new THREE.SphereGeometry(0.35, 8, 6);
+  const pts = []; for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){ const [cx, cz] = blockCenter(i, j); pts.push([cx - BLOCK / 2 + 1, cz - BLOCK / 2 + 1], [cx + BLOCK / 2 - 1, cz + BLOCK / 2 - 1]); }
+  const im = new THREE.InstancedMesh(g, mat(0x3a3540), pts.length); const lm = new THREE.MeshBasicMaterial({color: 0xfff1c0}); const ih = new THREE.InstancedMesh(h, lm, pts.length);
+  const o = new THREE.Object3D(); pts.forEach(([x, z], i) => { o.position.set(x, 2.1, z); o.updateMatrix(); im.setMatrixAt(i, o.matrix); o.position.y = 4.3; o.updateMatrix(); ih.setMatrixAt(i, o.matrix); });
+  scene.add(im, ih); window._lampMat = lm;
+}
+
+// ---------- sakinler ----------
+let residents = [];
+const people = { body: null, head: null, list: [] };
+const SKIN = [0xf1c7a2, 0xe0ac85, 0xc98d64, 0x9a6744];
+const CLOTH = [0xe24f4f, 0x3f8fbf, 0xf4b942, 0x5aa36b, 0x8a5bc4, 0xff8a2a, 0x2a2230, 0xf2f2f2];
+const labels = new Map();
+function makeLabel(u){
+  if (labels.has(u)) return labels.get(u);
+  const s = label3d('@' + u, 0, -99, 0, 'rgba(251,247,239,.95)', '#2a2230', 0.75); s.visible = false; labels.set(u, s); return s;
+}
+async function loadResidents(){
+  try { const r = await fetch('sakinler.json?v=' + Date.now()); residents = (await r.json()).sakinler || []; }
+  catch(e){ residents = []; }
+  residents = residents.map((r, i) => ({...r, u: norm(r.u), lot: lots[i % lots.length], idx: i}));
+  const n = residents.length;
+  $('pop').textContent = n.toLocaleString('tr-TR');
+  const pct = Math.min(100, n / GOAL * 100); $('goalbar').style.width = Math.max(3, pct) + '%';
+  $('goaltxt').textContent = `Ev sahipliği ${GOAL} takipçide açılıyor · ${n}/${GOAL}`;
+  // evler + insanlar
+  residents.forEach(r => { const L = r.lot; if (!L.house){ L.house = house(L.x, L.z, L.ry, 7, 7, rnd() < 0.25 ? 2 : 1); houseObjs.push(L.house); } });
+  lots.slice(n).forEach(L => { if (!L.sign){ L.sign = box(1.6, 1.0, 0.15, 0xffffff, L.x, 1.4, L.z, L.ry); box(0.15, 1.2, 0.15, 0x8a6347, L.x, 0.6, L.z); } });
+  const bg = new THREE.CapsuleGeometry(0.42, 0.9, 3, 8); const hg = new THREE.BoxGeometry(0.62, 0.62, 0.62);
+  people.body = new THREE.InstancedMesh(bg, new THREE.MeshLambertMaterial(), Math.max(1, n));
+  people.head = new THREE.InstancedMesh(hg, new THREE.MeshLambertMaterial(), Math.max(1, n));
+  people.body.castShadow = people.head.castShadow = true;
+  const col = new THREE.Color();
+  residents.forEach((r, i) => {
+    seed = 1000 + i * 7919;
+    col.setHex(pick(CLOTH)); people.body.setColorAt(i, col); col.setHex(pick(SKIN)); people.head.setColorAt(i, col);
+    const fx = Math.sin(r.lot.ry), fz = Math.cos(r.lot.ry);
+    const home = new THREE.Vector3(r.lot.x + fx * 6, 0, r.lot.z + fz * 6);
+    people.list.push({r, home, pos: home.clone(), tgt: home.clone(), speed: 1.4 + rnd() * 0.8, wait: rnd() * 4});
+  });
+  people.body.count = people.head.count = n;
+  scene.add(people.body, people.head);
+  const deep = norm(params.get('u')); if (deep) setTimeout(() => findUser(deep), 900);
+}
+const tmpO = new THREE.Object3D();
+function updatePeople(dt){
+  const L = people.list; if (!L.length) return;
+  for (let i = 0; i < L.length; i++){
+    const p = L[i];
+    if (p.wait > 0){ p.wait -= dt; }
+    else {
+      const d = p.tgt.clone().sub(p.pos); const len = d.length();
+      if (len < 0.2){ p.wait = 2 + Math.random() * 6; const a = Math.random() * Math.PI * 2, rr = 2 + Math.random() * 8; p.tgt.set(p.home.x + Math.cos(a) * rr, 0, p.home.z + Math.sin(a) * rr); }
+      else { p.pos.addScaledVector(d.normalize(), Math.min(len, p.speed * dt)); p.dir = Math.atan2(d.x, d.z); }
+    }
+    const bob = p.wait > 0 ? 0 : Math.abs(Math.sin(performance.now() / 160 + i)) * 0.12;
+    tmpO.position.set(p.pos.x, 0.95 + bob, p.pos.z); tmpO.rotation.set(0, p.dir || 0, 0); tmpO.scale.setScalar(p.hl ? 1.25 : 1); tmpO.updateMatrix(); people.body.setMatrixAt(i, tmpO.matrix);
+    tmpO.position.y = 2.15 + bob; tmpO.updateMatrix(); people.head.setMatrixAt(i, tmpO.matrix);
+  }
+  people.body.instanceMatrix.needsUpdate = people.head.instanceMatrix.needsUpdate = true;
+}
+// yakindaki isim etiketleri
+let lblT = 0;
+function updateLabels(){
+  const cp = camera.position; const arr = people.list.map((p, i) => [p.pos.distanceToSquared(cp), i]).sort((a, b) => a[0] - b[0]);
+  const show = new Set(arr.slice(0, 36).filter(a => a[0] < 90 * 90).map(a => a[1]));
+  if (focus) show.add(focus.i);
+  people.list.forEach((p, i) => { const vis = show.has(i); if (vis){ const s = makeLabel(p.r.u); s.visible = true; s.position.set(p.pos.x, 3.5, p.pos.z); } else { const s = labels.get(p.r.u); if (s) s.visible = false; } });
+}
+
+// ---------- gun / saat (Istanbul saati) ----------
+const skyDay = new THREE.Color(0xf3ead8), skyNight = new THREE.Color(0x1d2236), skyDusk = new THREE.Color(0xf2b58c);
+function updateSky(){
+  const now = new Date(); const ist = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Istanbul'}));
+  const h = params.get('saat') ? parseFloat(params.get('saat')) : ist.getHours() + ist.getMinutes() / 60;
+  $('clock').textContent = String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.floor((h % 1) * 60)).padStart(2, '0');
+  $('day').textContent = 'Gün ' + Math.max(1, Math.floor((now - START) / 864e5) + 1);
+  const ang = (h - 6) / 12 * Math.PI; const up = Math.sin(ang);
+  sun.position.set(Math.cos(ang) * 160, Math.max(20, up * 180), -90); sun.target.position.set(0, 0, 0);
+  const day = THREE.MathUtils.clamp(up * 2.2 + 0.3, 0, 1); const dusk = THREE.MathUtils.clamp(1 - Math.abs(up) * 4, 0, 1) * (h > 4 && h < 21 ? 1 : 0);
+  const sky = skyNight.clone().lerp(skyDay, day).lerp(skyDusk, dusk * 0.55);
+  scene.background = sky; scene.fog.color.copy(sky);
+  sun.intensity = 0.25 + 2.0 * day; hemi.intensity = 0.35 + 0.8 * day;
+  window._lampMat.color.setHex(day < 0.5 ? 0xffd27a : 0xf4efe2);
+}
+
+// ---------- kamera hareketleri ----------
+let fly = null;
+function flyTo(x, z, dist = 34, h = 26, ms = 1600){
+  const from = {p: camera.position.clone(), t: controls.target.clone()};
+  const to = {t: new THREE.Vector3(x, 0, z), p: new THREE.Vector3(x + dist * 0.55, h, z + dist)};
+  fly = {from, to, t0: performance.now(), ms};
+}
+function updateFly(){
+  if (!fly) return; const k = Math.min(1, (performance.now() - fly.t0) / fly.ms); const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  camera.position.lerpVectors(fly.from.p, fly.to.p, e); controls.target.lerpVectors(fly.from.t, fly.to.t, e);
+  if (k >= 1) fly = null;
+}
+
+// ---------- bul + kart ----------
+let focus = null;
+function findUser(q){
+  q = norm(q); if (!q){ toast('Bir kullanıcı adı yaz'); return; }
+  const i = people.list.findIndex(p => p.r.u === q);
+  if (i < 0){ showCard(null, q); return; }
+  if (focus) people.list[focus.i].hl = false;
+  focus = {i}; const p = people.list[i]; p.hl = true; p.wait = 30;
+  flyTo(p.pos.x, p.pos.z, 30, 22, 1800); showCard(p, q);
+}
+function showCard(p, q){
+  const b = $('cardbody');
+  if (!p){
+    b.innerHTML = `<h2>@${q} henüz burada değil</h2><p>Mahalleye taşınmak için <b>@bizimsokak.tr</b>'yi takip et ve son videoya <b>"ev"</b> yaz. Yarın sabah adın bir kapıda olur.</p>
+    <div class="row"><a class="pri" href="${IG}" target="_blank" rel="noopener">Instagram'a git</a></div>`;
+  } else {
+    const r = p.r; const no = r.idx + 1;
+    b.innerHTML = `<h2>@${r.u}</h2><p>${no}. komşu · ${r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Bizim Sokak sakini'}</p>
+    <div class="locks"><div>Evini süsle</div><div>Bahçe ekle</div><div>Kapıyı çal</div><div>Altın topla</div></div>
+    <p style="font-size:12px">Ev sahipliği ${GOAL} takipçide açılıyor. Takibi bırakanın evi boşaltılır.</p>
+    <div class="row"><button class="pri btn" id="share">Evimi paylaş</button><a class="sec" href="${IG}" target="_blank" rel="noopener">Takip et</a></div>`;
+    $('share').onclick = async () => {
+      const url = location.origin + location.pathname + '?u=' + encodeURIComponent(r.u);
+      const data = {title: 'Bizim Sokak', text: `Bak, Bizim Sokak'ta benim de evim var: @${r.u}`, url};
+      try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Link kopyalandı'); } } catch(e){}
+    };
+  }
+  $('card').classList.add('show');
+}
+$('cx').onclick = () => $('card').classList.remove('show');
+$('go').onclick = () => findUser($('q').value);
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter'){ $('q').blur(); findUser($('q').value); } });
+$('regbtn').onclick = () => $('menu').classList.toggle('open');
+function buildMenu(){
+  const m = $('menu');
+  Object.entries(landmarks).forEach(([k, [x, z]]) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = k; b.onclick = () => { m.classList.remove('open'); flyTo(x, z, 40, 30); }; m.appendChild(b); });
+  const all = document.createElement('button'); all.className = 'btn'; all.textContent = 'Tüm mahalle'; all.onclick = () => { m.classList.remove('open'); flyTo(0, 10, 170, 150, 1800); }; m.appendChild(all);
+}
+
+// ---------- sinema modu (video cekimi icin) ----------
+window.cine = { flyTo, findUser, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
+
+// ---------- dongu ----------
+function resize(){ const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.8 ? 48 : 38; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+camera.position.set(110, 150, 230); controls.target.set(0, 0, 10);
+buildMenu(); updateSky(); setInterval(updateSky, 30000);
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  updateFly(); controls.update(); updatePeople(dt);
+  if ((lblT += dt) > 0.25){ lblT = 0; updateLabels(); }
+  renderer.render(scene, camera); requestAnimationFrame(loop);
+}
+await loadResidents();
+requestAnimationFrame(loop);
+setTimeout(() => { $('load').classList.add('hide'); if (!params.get('u') && !CINE) flyTo(0, -6, 95, 80, 2600); }, 400);
+</script>
+</body>
+</html>
