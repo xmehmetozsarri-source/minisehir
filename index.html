@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Bizim Sokak</title>
-<meta name="description" content="Bizim Sokak: @bizimsokak.tr takipçilerinin yaşadığı küçük 3D mahalle. Kullanıcı adını yaz, evini bul.">
-<meta property="og:title" content="Bizim Sokak — Herkese bir ev">
+<title>Mini Şehir</title>
+<meta name="description" content="Mini Şehir: @minisehirr takipçilerinin yaşadığı küçük 3D şehir. Kullanıcı adını yaz, evini bul.">
+<meta property="og:title" content="Mini Şehir — Herkese bir ev">
 <meta property="og:description" content="Takip et, yorumlara 'ev' yaz, mahalleye taşın.">
 <meta name="theme-color" content="#f3ead8">
 <style>
@@ -45,6 +45,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f3ead8;font-family:-a
 #inbar.show{display:flex}
 #inbar button{background:var(--ink);color:#fff;border-radius:10px;padding:7px 11px;font-weight:700;font-size:12.5px}
 body.cine #inbar{display:none!important}
+#card{max-height:72vh;overflow:auto}
+.f{width:100%;border:1px solid #e3d9c8;border-radius:11px;padding:11px 12px;font:inherit;font-size:16px;margin:6px 0;background:#fff;color:var(--ink);outline:none}
+.f:focus{border-color:var(--accent)}
+.kv{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#6b6272;margin:6px 0;line-height:1.35}
+.kv input{margin-top:2px;width:18px;height:18px;accent-color:var(--accent)}
+.seg{display:flex;gap:6px;margin:6px 0 10px}.seg button{flex:1;border-radius:10px;padding:9px;background:#efe7d8;font-weight:700;font-size:13px}.seg button.on{background:var(--ink);color:#fff}
+.ok{color:#2f8a4f;font-weight:700}.nl{list-style:none;padding:0;margin:8px 0}.nl li{padding:8px 0;border-bottom:1px solid #eee3d2;font-size:13.5px}.nl small{color:var(--muted)}
+.adm h3{font-size:13px;margin:12px 0 2px;color:#6b6272;text-transform:uppercase;letter-spacing:.5px}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(42,34,48,.92);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:80%}
 #toast.show{opacity:1}
 #load{position:fixed;inset:0;background:#f3ead8;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
@@ -56,12 +64,13 @@ body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!imp
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="load"><h1>Bizim Sokak</h1><p>Mahalle uyanıyor…</p></div>
-<div class="brand"><h1>Bizim Sokak</h1><small>@bizimsokak.tr · herkese bir ev</small>
+<div id="load"><h1>Mini Şehir</h1><p>Şehir uyanıyor…</p></div>
+<div class="brand"><h1>Mini Şehir</h1><small>@minisehirr · herkese bir ev</small>
   <div class="goal"><span id="goaltxt">Takip et, son videoya “ev” yaz → evin hazır</span></div></div>
 <div class="hud">
   <div class="chip">Nüfus: <b id="pop">0</b></div>
   <div class="chip"><span id="day">Gün 1</span> · <b id="clock">00:00</b></div>
+  <div id="mechips" style="display:flex;flex-direction:column;gap:6px;align-items:flex-end"></div>
   <button class="chip btn" id="regbtn">Bölgeler ▾</button>
   <div id="menu"></div>
 </div>
@@ -76,7 +85,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
 const START = new Date('2026-11-11T00:00:00+03:00');
-const IG = 'https://www.instagram.com/bizimsokak.tr/';
+const IG = 'https://www.instagram.com/minisehirr/';
 const params = new URLSearchParams(location.search);
 const CINE = params.has('cine');
 if (CINE) document.body.classList.add('cine');
@@ -89,7 +98,17 @@ const pick = (a, r = rnd) => a[Math.floor(r() * a.length)];
 const $ = id => document.getElementById(id);
 function toast(t, ms = 2600){ const e = $('toast'); e.textContent = t; e.classList.add('show'); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('show'), ms); }
 const norm = s => (s || '').trim().replace(/^@+/, '').toLowerCase();
-const residentsP = fetch('sakinler.json?v=' + Date.now()).then(r => r.json()).then(j => j.sakinler || []).catch(() => []);
+const FOUNDER = 'minisehirr';
+const SB_URL = 'https://jskzpsmfewubqssralzz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impza3pwc21mZXd1YnFzc3JhbHp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MTM2OTMsImV4cCI6MjEwOTk4OTY5M30.6a9G5znNEAlzOkwYCJnSGDYgS9MwVDC1a5qQnalADWs';
+let sb = null, ME = {u: null, admin: false, unseen: 0}; const SETTINGS = {time_mode: 'auto'};
+const sbP = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm')
+  .then(m => { sb = m.createClient(SB_URL, SB_KEY, {auth: {persistSession: true, storageKey: 'ms-auth'}}); return sb; }).catch(() => null);
+async function fetchResidents(){
+  if (await sbP){ try { const {data, error} = await sb.from('residents').select('u,t,idx,banned,claimed').order('idx'); if (!error && data && data.length) return data; } catch(e){} }
+  try { const j = await (await fetch('sakinler.json?v=' + Date.now())).json(); return j.sakinler || []; } catch(e){ return []; }
+}
+const residentsP = fetchResidents();
 
 // ---------- performans ayarlari ----------
 const UA = navigator.userAgent;
@@ -480,7 +499,7 @@ function signTexture(){
   x.textAlign = 'center'; x.textBaseline = 'middle';
   x.fillStyle = '#fff'; x.font = '800 50px Arial, sans-serif'; x.fillText('BU EV BOŞ', 256, 43);
   x.fillStyle = '#2a2230'; x.font = '700 33px Arial, sans-serif'; x.fillText('Takip et ve son videoya', 256, 126); x.fillText('“ev” yaz, ev senin olsun!', 256, 172);
-  x.fillStyle = '#ff8a2a'; x.font = '800 30px Arial, sans-serif'; x.fillText('@bizimsokak.tr', 256, 238);
+  x.fillStyle = '#ff8a2a'; x.font = '800 30px Arial, sans-serif'; x.fillText('@minisehirr', 256, 238);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
@@ -553,7 +572,8 @@ function newTarget(p){
 }
 async function loadResidents(){
   residents = (await residentsP).map((r, i) => ({...r, u: norm(r.u), idx: i}));
-  residents.forEach((r, i) => { r.lot = lots[i % lots.length]; if (i < lots.length) r.lot.owner = i; });
+  residents.forEach((r, i) => { r.lot = lots[i % lots.length]; if (i < lots.length && !r.banned) r.lot.owner = i; });
+  residents = residents.filter(r => !r.banned);
   const n = residents.length;
   $('pop').textContent = n.toLocaleString('tr-TR');
   // evler + bos arsalar
@@ -580,9 +600,9 @@ async function loadResidents(){
   people.parts = makeParts(Math.max(1, C));
   residents.forEach((r, i) => {
     const look = makeLook(RNG(hashStr(r.u)));
-    if (r.u === 'bizimsokak.tr') Object.assign(look, {hair: 0x2b2118, shirt: 0x2f3a52, pants: 0x23232a, hairStyle: 'S', cap: false, skirt: false, s: 1.12});
+    if (r.u === FOUNDER) Object.assign(look, {hair: 0x2b2118, shirt: 0x2f3a52, pants: 0x23232a, hairStyle: 'S', cap: false, skirt: false, s: 1.12});
     const [hx, hz] = lw(r.lot, r.lot.h ? r.lot.h.dx : 0, WALKZ);
-    const p = {key: 'u:' + r.u, r, founder: r.u === 'bizimsokak.tr', look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
+    const p = {key: 'u:' + r.u, r, founder: r.u === FOUNDER, look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
     newTarget(p); people.list.push(p); setLook(i, look);
   });
   npcSpots.forEach((s, k) => {
@@ -667,7 +687,7 @@ function bubble(p, text){
   const s = new THREE.Sprite(new THREE.SpriteMaterial({map: t, depthTest: false, transparent: true})); s.renderOrder = 12; s.scale.set(w / 96 * 1.6, 1.6, 1); scene.add(s);
   p.bub = {s, t: 2.8};
 }
-const HELLO = ['Selam komşu! 👋', 'Hoş geldin! 😊', 'Beni buldun! 😄', 'Çay demledim, gel ☕', 'Kapım herkese açık 🏠', 'Bizim Sokak en güzeli!', 'Napıyorsun komşu?'];
+const HELLO = ['Selam komşu! 👋', 'Hoş geldin! 😊', 'Beni buldun! 😄', 'Çay demledim, gel ☕', 'Kapım herkese açık 🏠', 'Mini Şehir en güzeli!', 'Napıyorsun komşu?'];
 function react(i, card = true){
   const p = people.list[i]; if (!p) return;
   p.jump = 0.55; p.wave = 1.8; p.wait = Math.max(p.wait, 2.6); p.moving = false;
@@ -696,7 +716,7 @@ function tap(x, y){
   if (inside) return;
   let lb = null; bd = 70 * 70;
   lots.forEach(L => { const s = scr(L.x, 2.5, L.z); if (!s) return; const d = (s[0] - x) ** 2 + (s[1] - y) ** 2; if (d < bd){ bd = d; lb = L; } });
-  if (lb && lb.owner !== undefined && lb.owner < residents.length){ const i = people.list.findIndex(p => p.r && p.r.idx === lb.owner); react(i); return; }
+  if (lb && lb.owner !== undefined){ const i = people.list.findIndex(p => p.r && p.r.idx === lb.owner); if (i >= 0){ react(i); return; } }
   if (lb) { showJoin(); return; }
 }
 
@@ -705,7 +725,7 @@ const skyDay = new THREE.Color(0xf3ead8), skyNight = new THREE.Color(0x1d2236), 
 let nightK = 0; const isNight = () => nightK > 0.5;
 function updateSky(){
   const now = new Date(); const ist = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Istanbul'}));
-  const h = params.get('saat') ? parseFloat(params.get('saat')) : ist.getHours() + ist.getMinutes() / 60;
+  const tm = SETTINGS.time_mode; const h = params.get('saat') ? parseFloat(params.get('saat')) : tm === 'day' ? 13 : tm === 'night' ? 22 : ist.getHours() + ist.getMinutes() / 60;
   $('clock').textContent = String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.floor((h % 1) * 60)).padStart(2, '0');
   $('day').textContent = 'Gün ' + Math.max(1, Math.floor((now - START) / 864e5) + 1);
   const ang = (h - 6) / 12 * Math.PI; const up = Math.sin(ang);
@@ -727,7 +747,7 @@ let fly = null;
 // ---------- ic mekan: gir / cik ----------
 let inside = null, chatT = 0;
 const roomPeople = name => people.list.filter(p => p.room === name);
-const getMe = () => { try { return localStorage.getItem('bs_me') || ''; } catch(e){ return ''; } };
+const getMe = () => { if (ME.u) return ME.u; try { return localStorage.getItem('bs_me') || ''; } catch(e){ return ''; } };
 function showBuilding(name){
   const R = ROOMS[name], occ = roomPeople(name);
   $('cardbody').innerHTML = `<h2>${R.icon} ${name}</h2><p>İçeride <b>${occ.length} kişi</b> var: ${occ.map(p => p.npc ? p.name : '@' + p.r.u).join(', ')}</p>
@@ -784,29 +804,146 @@ function findUser(q){
   const [gx, gz] = lw(p.r.lot, p.dx, FZ - 1.4); p.pos.set(gx, 0, gz); p.tgt.copy(p.pos); flyTo(p.pos.x, p.pos.z, 17, 17, 1800, p.r.lot.ry); setTimeout(() => react(i, false), 1900); showCard(p, q);
 }
 function showJoin(){
-  $('cardbody').innerHTML = `<h2>Bu ev boş 🏠</h2><p><b>@bizimsokak.tr</b>'yi takip et ve son videoya <b>"ev"</b> yaz. Sıradaki boş ev senin olur, kapının üstünde adın yazar.</p><p style="font-size:12px">İlk gelenler meydana en yakın evleri alır.</p>
+  $('cardbody').innerHTML = `<h2>Bu ev boş 🏠</h2><p><b>@minisehirr</b>'ı takip et ve son videoya <b>"ev"</b> yaz. Sıradaki boş ev senin olur, kapının üstünde adın yazar.</p><p style="font-size:12px">İlk gelenler meydana en yakın evleri alır.</p>
   <div class="row"><a class="pri" href="${IG}" target="_blank" rel="noopener">Takip et</a></div>`;
   $('card').classList.add('show');
 }
 function showCard(p, q){
   const b = $('cardbody');
   if (!p){
-    b.innerHTML = `<h2>@${q} henüz burada değil</h2><p>Mahalleye taşınmak için <b>@bizimsokak.tr</b>'yi takip et ve son videoya <b>"ev"</b> yaz. Yarın adın bir kapıda olur.</p>
+    b.innerHTML = `<h2>@${q} henüz burada değil</h2><p>Mahalleye taşınmak için <b>@minisehirr</b>'ı takip et ve son videoya <b>"ev"</b> yaz. Yarın adın bir kapıda olur.</p>
     <div class="row"><a class="pri" href="${IG}" target="_blank" rel="noopener">Instagram'a git</a></div>`;
   } else {
     const r = p.r; const no = r.idx + 1;
-    b.innerHTML = `<h2>${p.founder ? '★ ' : ''}@${r.u}</h2><p>${p.founder ? 'Kurucu · Bizim Sokak\'ın yapımcısı' : no + '. komşu · ' + (r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Bizim Sokak sakini')}</p>
-    <div class="locks"><div>Evini süsle</div><div>Bahçe ekle</div><div>Kapıyı çal</div><div>Altın topla</div></div>
-    <p style="font-size:12px">Yakında: evini süsle, kapı çal, bildirim al. Takibi bırakanın evi boşaltılır.</p>
-    <div class="row"><button class="pri btn" id="share">Evimi paylaş</button><button class="sec btn" id="itsme">${getMe() === r.u ? 'Sen ✓' : 'Bu benim'}</button></div>`;
-    $('itsme').onclick = () => { try { localStorage.setItem('bs_me', r.u); } catch(e){} $('itsme').textContent = 'Sen ✓'; toast('Tamam! Fırına, kahvehaneye girince karakterin de seninle gelir'); };
+    b.innerHTML = `<h2>${p.founder ? '★ ' : ''}@${r.u}</h2><p>${p.founder ? 'Kurucu · Mini Şehir\'in yapımcısı' : no + '. komşu · ' + (r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Mini Şehir sakini')}</p>
+    <p>${ME.u === r.u ? '<span class="ok">✓ Senin evin</span>' : r.claimed ? '<span class="ok">✓ Sahibi var</span>' : 'Bu ev sahibini bekliyor 🔑'}</p>
+    <div class="locks"><div>Evini süsle</div><div>Bahçe ekle</div><div>Evine davet et</div><div>Altın topla</div></div>
+    <p style="font-size:12px">Takibi bırakanın evi boşaltılır.</p>
+    <div class="row">${ME.u === r.u ? `<button class="pri btn" id="share">Evimi paylaş</button><button class="sec btn" id="notifs">🔔 Bildirimler${ME.unseen ? ' (' + ME.unseen + ')' : ''}</button>`
+      : !r.claimed ? `<button class="pri btn" id="claim">Evimi sahiplen 🔑</button><button class="sec btn" id="share">Paylaş</button>`
+      : `<button class="pri btn" id="knock">Kapıyı çal 🚪</button><button class="sec btn" id="share">Paylaş</button>`}</div>`;
+    if ($('claim')) $('claim').onclick = () => showClaim(p);
+    if ($('knock')) $('knock').onclick = () => doKnock(p);
+    if ($('notifs')) $('notifs').onclick = showNotifs;
     $('share').onclick = async () => {
       const url = location.origin + location.pathname + '?u=' + encodeURIComponent(r.u);
-      const data = {title: 'Bizim Sokak', text: `Bak, Bizim Sokak'ta benim de evim var: @${r.u}`, url};
+      const data = {title: 'Mini Şehir', text: `Bak, Mini Şehir'de benim de evim var: @${r.u}`, url};
       try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Link kopyalandı'); } } catch(e){}
     };
   }
   $('card').classList.add('show');
+}
+
+// ---------- sunucu: sahiplenme, kapi, bildirim, yonetim ----------
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const openCard = html => { $('cardbody').innerHTML = html; $('card').classList.add('show'); };
+async function ensureSession(){
+  if (!(await sbP)) throw new Error('sunucu');
+  const {data: {session}} = await sb.auth.getSession();
+  if (session) return;
+  const {error} = await sb.auth.signInAnonymously(); if (error) throw error;
+}
+async function refreshMe(){
+  if (!sb) return;
+  try { const {data} = await sb.rpc('whoami'); if (data){ ME = data; if (ME.u){ try { localStorage.setItem('bs_me', ME.u); } catch(e){} } } } catch(e){}
+  updateMeUI();
+}
+function updateMeUI(){
+  const box = $('mechips'); box.innerHTML = '';
+  if (ME.u){ const b = document.createElement('button'); b.className = 'chip btn'; b.innerHTML = `🏠 @${esc(ME.u)}${ME.unseen ? ' · 🔔 ' + ME.unseen : ''}`; b.onclick = () => { findUser(ME.u); if (ME.unseen) setTimeout(showNotifs, 1900); }; box.appendChild(b); }
+  if (ME.admin){ const a = document.createElement('button'); a.className = 'chip btn'; a.textContent = '⚙️ Yönetim'; a.onclick = showAdmin; box.appendChild(a); }
+}
+function showClaim(p){
+  const r = p.r;
+  openCard(`<h2>🔑 Evini sahiplen</h2><p><b>@${esc(r.u)}</b> için ayrılan ev seni bekliyor. E-postanı yaz, ev hemen senin olsun.</p>
+  <p>Kapın çalındığında ya da yanına yeni komşu taşındığında sana haber verelim.</p>
+  <input class="f" id="em" type="email" inputmode="email" autocomplete="email" placeholder="ornek@gmail.com">
+  <label class="kv"><input type="checkbox" id="kv" checked><span>Oyun bildirimleri için e-postamın saklanmasını kabul ediyorum. <a href="#" id="gz">Gizlilik</a></span></label>
+  <div class="row"><button class="pri btn" id="doclaim">Evimi al 🏠</button></div>
+  <p style="font-size:11.5px;text-align:center">Şifre yok, kod yok. E-postan kimseyle paylaşılmaz, reklam gönderilmez.</p>`);
+  $('gz').onclick = e => { e.preventDefault(); showPrivacy(() => showClaim(p)); };
+  $('doclaim').onclick = async () => {
+    const em = $('em').value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ toast('E-posta adresini kontrol et'); return; }
+    if (!$('kv').checked){ toast('Devam etmek için onay kutusunu işaretle'); return; }
+    const b = $('doclaim'); b.disabled = true; b.textContent = 'Anahtarın hazırlanıyor…';
+    try {
+      await ensureSession();
+      const {data, error} = await sb.rpc('claim_house', {p_u: r.u, p_email: em}); if (error) throw error;
+      const msg = {tamam: '🎉 Ev artık senin!', baglandi: '🎉 Evine tekrar hoş geldin!', zaten_senin: 'Bu ev zaten senin ✓', baskasinin: 'Bu ev başka bir e-postayla sahiplenilmiş. Senin evinse o e-postayı yaz.', sakin_yok: 'Bu ev henüz listede değil.', yasakli: 'Bu ev kapatılmış.', eposta_hatali: 'E-posta adresini kontrol et.'}[data] || 'Bir sorun oldu, tekrar dene.';
+      toast(msg, 3200);
+      if (['tamam', 'baglandi', 'zaten_senin'].includes(data)){ r.claimed = true; await refreshMe(); react(people.list.indexOf(p), false); showCard(p); return; }
+    } catch(e){ toast('Bağlantı sorunu, birazdan tekrar dene'); }
+    b.disabled = false; b.textContent = 'Evimi al 🏠';
+  };
+}
+function showPrivacy(back){
+  openCard(`<h2>Gizlilik</h2><p>Mini Şehir yalnızca Instagram kullanıcı adını ve, verirsen, e-posta adresini saklar.</p>
+  <p>E-postan sadece oyun bildirimleri için kullanılır (kapın çalındı, yeni komşun var gibi). Kimseyle paylaşılmaz, reklam gönderilmez.</p>
+  <p>Bildirimlerden istediğin an çıkabilirsin. E-postanın ve evinin silinmesini istersen Instagram'dan <b>@minisehirr</b>'a yazman yeterli.</p>
+  <div class="row"><button class="sec btn" id="bk">Geri</button></div>`);
+  $('bk').onclick = back;
+}
+async function doKnock(p){
+  if (!ME.u){ toast('Kapı çalmak için önce kendi evini sahiplen: kendi kullanıcı adını ara 🔑', 3500); return; }
+  try {
+    const {data, error} = await sb.rpc('knock', {p_to: p.r.u}); if (error) throw error;
+    if (data === 'tamam'){ toast(`🚪 Tak tak! @${p.r.u}'a haber verildi`); p.jump = 0.55; bubble(p, 'Geliyorum! 🏃'); }
+    else toast({bekle: 'Bu kapıyı az önce çaldın, biraz bekle 😊', kendin: 'Kendi kapını çalamazsın 😄', once_sahiplen: 'Önce kendi evini sahiplen 🔑'}[data] || 'Olmadı, tekrar dene');
+  } catch(e){ toast('Bağlantı sorunu'); }
+}
+const ago = t => { const m = Math.round((Date.now() - new Date(t)) / 60000); return m < 1 ? 'şimdi' : m < 60 ? m + ' dk önce' : m < 1440 ? Math.round(m / 60) + ' saat önce' : Math.round(m / 1440) + ' gün önce'; };
+async function showNotifs(){
+  if (!sb || !ME.u) return;
+  const {data} = await sb.from('events').select('from_u,kind,created_at,seen').eq('to_u', ME.u).order('created_at', {ascending: false}).limit(30);
+  const items = (data || []).map(e => `<li>${e.seen ? '' : '🟠 '}${e.kind === 'knock' ? `<b>@${esc(e.from_u)}</b> kapını çaldı 🚪` : esc(e.kind)}<br><small>${ago(e.created_at)}</small></li>`).join('');
+  openCard(`<h2>🔔 Bildirimler</h2>${items ? `<ul class="nl">${items}</ul>` : '<p>Henüz bildirim yok. Komşuların kapını çaldığında burada görünecek.</p>'}`);
+  if ((data || []).some(e => !e.seen)){ await sb.from('events').update({seen: true}).eq('to_u', ME.u).eq('seen', false); ME.unseen = 0; updateMeUI(); }
+}
+function showAdminLogin(){
+  openCard(`<h2>⚙️ Yönetici girişi</h2><input class="f" id="ae" type="email" autocomplete="username" placeholder="E-posta"><input class="f" id="ap" type="password" autocomplete="current-password" placeholder="Şifre">
+  <div class="row"><button class="pri btn" id="alog">Giriş yap</button></div>`);
+  $('alog').onclick = async () => {
+    if (!(await sbP)){ toast('Sunucuya ulaşılamadı'); return; }
+    const {error} = await sb.auth.signInWithPassword({email: $('ae').value.trim(), password: $('ap').value});
+    if (error){ toast('Giriş olmadı: e-posta ya da şifre yanlış'); return; }
+    await refreshMe(); if (ME.admin) showAdmin(); else toast('Bu hesap yönetici değil');
+  };
+}
+async function showAdmin(){
+  const {data: rs} = await sb.from('residents').select('u,banned,claimed').order('idx');
+  const all = rs || [], tm = SETTINGS.time_mode;
+  openCard(`<div class="adm"><h2>⚙️ Yönetim</h2><p>Nüfus: <b>${all.filter(x => !x.banned).length}</b> · Sahiplenen: <b>${all.filter(x => x.claimed).length}</b> · Engelli: <b>${all.filter(x => x.banned).length}</b></p>
+  <h3>Saat (herkes için)</h3><div class="seg"><button class="btn ${tm === 'auto' ? 'on' : ''}" data-m="auto">Otomatik</button><button class="btn ${tm === 'day' ? 'on' : ''}" data-m="day">☀️ Gündüz</button><button class="btn ${tm === 'night' ? 'on' : ''}" data-m="night">🌙 Gece</button></div>
+  <h3>Yeni sakin ekle</h3><textarea class="f" id="newu" rows="3" placeholder="Kullanıcı adları: virgülle ya da alt alta"></textarea><div class="row"><button class="pri btn" id="addu">Şehre ekle</button></div>
+  <h3>Sakin yönet</h3><input class="f" id="mu" placeholder="@kullanıcıadı" autocapitalize="off">
+  <div class="row"><button class="sec btn" id="mgo">Evine git</button><button class="sec btn" id="mban">Engelle</button></div>
+  <div class="row"><button class="sec btn" id="munban">Engeli kaldır</button><button class="sec btn" id="mreset">Sahipliği sıfırla</button></div>
+  <div class="row"><button class="sec btn" id="alogout">Çıkış</button></div></div>`);
+  document.querySelectorAll('.seg button').forEach(b => b.onclick = async () => {
+    const m = b.dataset.m; const {error} = await sb.from('settings').upsert({key: 'time_mode', value: m});
+    if (error){ toast('Kaydedilemedi'); return; } SETTINGS.time_mode = m; updateSky(); toast('Saat ayarı herkes için güncellendi'); showAdmin();
+  });
+  $('addu').onclick = async () => {
+    const list = [...new Set($('newu').value.split(/[\s,;]+/).map(norm).filter(u => /^[a-z0-9._]{1,30}$/.test(u)))];
+    if (!list.length){ toast('Kullanıcı adı yaz'); return; }
+    const {error} = await sb.from('residents').upsert(list.map(u => ({u})), {onConflict: 'u', ignoreDuplicates: true});
+    toast(error ? 'Eklenemedi' : `${list.length} sakin eklendi. Evleri sayfa yenilenince çıkar.`, 3200); if (!error) $('newu').value = '';
+  };
+  const mu = () => norm($('mu').value);
+  const upd = async (vals, msg) => { const u = mu(); if (!u) return; const {error} = await sb.from('residents').update(vals).eq('u', u); toast(error ? 'Olmadı' : msg); };
+  $('mgo').onclick = () => { const u = mu(); if (u){ $('card').classList.remove('show'); findUser(u); } };
+  $('mban').onclick = async () => { const u = mu(); if (!u) return; await sb.from('claims').delete().eq('u', u); await upd({banned: true, claimed: false}, `@${u} engellendi, evi boşaltıldı`); };
+  $('munban').onclick = () => upd({banned: false}, 'Engel kaldırıldı');
+  $('mreset').onclick = async () => { const u = mu(); if (!u) return; const {error} = await sb.from('claims').delete().eq('u', u); await upd({claimed: false}, error ? 'Olmadı' : `@${u} sahipliği sıfırlandı`); };
+  $('alogout').onclick = async () => { await sb.auth.signOut(); ME = {u: null, admin: false, unseen: 0}; updateMeUI(); $('card').classList.remove('show'); toast('Çıkış yapıldı'); };
+}
+async function initServer(){
+  if (!(await sbP)) return;
+  try { const {data} = await sb.from('settings').select('key,value'); (data || []).forEach(r => SETTINGS[r.key] = r.value); updateSky(); } catch(e){}
+  try { const {data: {session}} = await sb.auth.getSession(); if (session) await refreshMe(); } catch(e){}
+  if (params.has('yonetici') && !ME.admin) showAdminLogin();
+  setInterval(() => { if (ME.u && !document.hidden) refreshMe(); }, 60000);
 }
 $('cx').onclick = () => $('card').classList.remove('show');
 $('go').onclick = () => findUser($('q').value);
@@ -819,7 +956,7 @@ function buildMenu(){
 }
 
 // ---------- sinema modu (video cekimi icin) ----------
-window.cine = { flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
+window.cine = { showAdmin, showClaim, flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
 
 // ---------- dongu ----------
 function resize(){ const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.8 ? 48 : 38; camera.updateProjectionMatrix(); }
@@ -827,7 +964,7 @@ addEventListener('resize', resize); resize();
 camera.position.set(110, 150, 230); controls.target.set(0, 0, 10);
 buildMenu();
 await loadResidents();
-updateSky(); setInterval(updateSky, 30000);
+updateSky(); setInterval(updateSky, 30000); initServer();
 let last = performance.now(), fpsN = 0, fpsT = 0;
 function loop(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
