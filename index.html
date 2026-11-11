@@ -92,7 +92,7 @@ body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!imp
   <div id="menu"></div>
 </div>
 <div class="find"><input id="q" placeholder="Ara: @kullanıcıadı ya da evime git" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" id="go">Bul</button></div>
-<div id="inbar"><span id="intitle"></span><button class="btn" id="exitbtn">← Dışarı çık</button></div>
+<div id="inbar"><span id="intitle"></span><button class="btn" id="orderbtn" style="background:var(--accent)">🍽️ Sipariş</button><button class="btn" id="exitbtn">← Dışarı çık</button></div>
 <div id="card"><button class="x btn" id="cx">×</button><div id="cardbody"></div></div>
 <div id="toast"></div>
 <div id="workbar"><span id="worktxt"></span><button class="btn" id="workgo">İzle</button><button class="btn" id="workstop">Bırak</button></div>
@@ -408,37 +408,118 @@ for (let k = 0; k <= N; k++){
 const STATION = {};
 function buildStation(cx, cz){
   STATION.cx = cx; STATION.cz = cz;
+  const W = (x, z) => [cx - x, cz - z]; STATION.W = W;   // yerel -> dunya (180 derece donuk)
+  S.frame(cx, cz, Math.PI); WL.frame(cx, cz, Math.PI);
   const PL = 0xd9cdb6, PT = 1.3, ph = PT - 0.3;
-  const seg = (x0, x1, z0, z1) => S.box(x1 - x0, ph, z1 - z0, PL, cx + (x0 + x1) / 2, 0.3 + ph / 2, cz + (z0 + z1) / 2);
+  const seg = (x0, x1, z0, z1) => S.box(x1 - x0, ph, z1 - z0, PL, (x0 + x1) / 2, 0.3 + ph / 2, (z0 + z1) / 2);
   seg(-11, 11, -11, -9); seg(-11, 11, -5, 0.9); seg(-11, -7.2, -9, -5); seg(-4.8, 4.8, -9, -5); seg(7.2, 11, -9, -5);
-  for (const [z, f] of [[-12.5, 1 / 3], [-11.9, 2 / 3], [-11.3, 1]]) S.box(8, ph * f, 0.6, PL, cx, 0.3 + ph * f / 2, cz + z);
+  for (const [z, f] of [[-12.5, 1 / 3], [-11.9, 2 / 3], [-11.3, 1]]) S.box(8, ph * f, 0.6, PL, 0, 0.3 + ph * f / 2, z);
   for (const sx of [-6, 6]){
-    for (let k = 0; k < 3; k++){ const top = PT - 0.25 * (k + 1); S.box(2.4, top - 0.3, 1, 0xcfc3ad, cx + sx, 0.3 + (top - 0.3) / 2, cz - 5.5 - k); }
-    S.box(2.4, 0.05, 1, 0x8a8478, cx + sx, 0.32, cz - 8.5);
-    S.pl(2.4, ph, 0x121018, cx + sx, 0.3 + ph / 2, cz - 8.97, 0);
-    for (const s2 of [-1, 1]) S.box(0.08, 0.9, 4.1, 0x3a3540, cx + sx + s2 * 1.25, PT + 0.45, cz - 7);
-    S.box(2.6, 0.08, 0.08, 0x3a3540, cx + sx, PT + 0.9, cz - 9.05);
-    S.box(0.1, 2.4, 0.1, 0x3a3540, cx + sx + 1.6, PT + 1.2, cz - 4.7); S.box(0.9, 0.9, 0.14, 0x2f6fb5, cx + sx + 1.6, PT + 2.6, cz - 4.7);
-    label3d('🚆 Metro', cx + sx + 1.6, PT + 3.7, cz - 4.7, '#2f6fb5', '#fff', 0.55);
+    for (let k = 0; k < 3; k++){ const top = PT - 0.25 * (k + 1); S.box(2.4, top - 0.3, 1, 0xcfc3ad, sx, 0.3 + (top - 0.3) / 2, -5.5 - k); }
+    S.box(2.4, 0.05, 1, 0x8a8478, sx, 0.32, -8.5);
+    S.pl(2.4, ph, 0x121018, sx, 0.3 + ph / 2, -8.97, 0);
+    for (const s2 of [-1, 1]) S.box(0.08, 0.9, 4.1, 0x3a3540, sx + s2 * 1.25, PT + 0.45, -7);
+    S.box(2.6, 0.08, 0.08, 0x3a3540, sx, PT + 0.9, -9.05);
+    S.box(0.1, 2.4, 0.1, 0x3a3540, sx + 1.6, PT + 1.2, -4.7); S.box(0.9, 0.9, 0.14, 0x2f6fb5, sx + 1.6, PT + 2.6, -4.7);
+    const [lx, lz] = W(sx + 1.6, -4.7); label3d('🚆 Metro', lx, PT + 3.7, lz, '#2f6fb5', '#fff', 0.55);
   }
-  const BW = 22, BD = 8, BH = 6, bz = cz + 4.9, fz = bz - BD / 2;
-  S.box(BW + 0.4, 0.5, BD + 0.4, 0xb7ad9c, cx, 0.55, bz);
-  S.box(BW, BH, BD, 0xf1e2c4, cx, 0.8 + BH / 2, bz);
-  S.box(BW + 0.7, 0.45, BD + 0.7, 0xe0cfae, cx, 0.8 + BH + 0.22, bz);
-  S.box(BW + 0.2, 0.18, 0.2, 0xe0cfae, cx, 0.8 + 3.2, fz - 0.1);
-  for (let k = -4; k <= 4; k++){ if (k === 0) continue; const x = cx + k * 2.35; S.pl(1.8, 3.6, TRIM, x, 1.3 + 2.4, fz - 0.02, Math.PI); WL.pl(1.5, 3.3, GLASS, x, 1.3 + 2.4, fz - 0.04, Math.PI); S.pl(0.08, 3.3, TRIM, x, 1.3 + 2.4, fz - 0.06, Math.PI); }
-  S.pl(3.2, 3.4, TRIM, cx, 1.3 + 1.7, fz - 0.02, Math.PI); S.pl(2.8, 3.2, 0x5a3e2e, cx, 1.3 + 1.6, fz - 0.04, Math.PI);
+  const BW = 22, BD = 8, BH = 6, bz = 4.9, fz = bz - BD / 2, rz = bz + BD / 2;
+  S.box(BW + 0.4, 0.5, BD + 0.4, 0xb7ad9c, 0, 0.55, bz);
+  S.box(BW, BH, BD, 0xf1e2c4, 0, 0.8 + BH / 2, bz);
+  S.box(BW + 0.7, 0.45, BD + 0.7, 0xe0cfae, 0, 0.8 + BH + 0.22, bz);
+  for (const [zz, ry, o] of [[fz, Math.PI, -1], [rz, 0, 1]]){
+    S.box(BW + 0.2, 0.18, 0.2, 0xe0cfae, 0, 0.8 + 3.2, zz + o * 0.1);
+    for (let k = -4; k <= 4; k++){ if (k === 0) continue; const x = k * 2.35; S.pl(1.8, 3.6, TRIM, x, 1.3 + 2.4, zz + o * 0.02, ry); WL.pl(1.5, 3.3, GLASS, x, 1.3 + 2.4, zz + o * 0.04, ry); S.pl(0.08, 3.3, TRIM, x, 1.3 + 2.4, zz + o * 0.06, ry); }
+    S.pl(3.2, 3.4, TRIM, 0, 1.3 + 1.7, zz + o * 0.02, ry); S.pl(2.8, 3.2, 0x5a3e2e, 0, 1.3 + 1.6, zz + o * 0.04, ry);
+  }
   const tz = fz + 1.6, ttop = 0.8 + 12;
-  S.box(4, 12, 3.2, 0xf1e2c4, cx, 0.8 + 6, tz); S.box(4.4, 0.4, 3.6, 0xe0cfae, cx, ttop + 0.2, tz);
-  S.cyl(0, 3.1, 2.6, 4, 0x8c5a3c, cx, ttop + 0.4 + 1.3, tz);
-  S.cyl(0.06, 0.08, 3.2, 6, 0xdddddd, cx, ttop + 0.4 + 2.6 + 1.6, tz);
-  makeFlag(cx, ttop + 0.4 + 2.6 + 3.15, tz, 2.0, -Math.PI / 2);
-  const ck = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshLambertMaterial({map: clockTex, transparent: true}));
-  ck.position.set(cx, 0.8 + 9.6, tz - 1.62); ck.rotation.y = Math.PI; scene.add(ck); drawClock();
-  label3d('🚆 Mini Şehir Garı', cx, 0.8 + BH + 2.3, fz - 1.4, '#2f6fb5', '#fff', 1);
-  for (const sx of [-9.6, 9.6]){ S.box(1.3, 0.6, 1.3, 0xb7ad9c, cx + sx, PT + 0.3, cz - 2.6); S.ico(0.75, 0x4f8a45, cx + sx, PT + 1.05, cz - 2.6, 0.9); S.box(1.3, 0.6, 1.3, 0xb7ad9c, cx + sx, PT + 0.3, cz - 10); S.ico(0.75, 0x5e9450, cx + sx, PT + 1.05, cz - 10, 0.9); }
-  landmarks['Gar'] = [cx, cz - 6];
-  npcSpots.push({name: 'Gar Şefi Kemal', x: cx - 3, z: cz - 3, y: PT, path: [[cx - 3, cz - 3], [cx + 3, cz - 3], [cx + 3, cz - 10], [cx - 3, cz - 10]], say: ['Hoş geldin! Trenler her gece gelir 🚆', 'Yeni komşular yolda!', "Mini Şehir'e hoş geldin!"]});
+  S.box(4, 12, 3.2, 0xf1e2c4, 0, 0.8 + 6, tz); S.box(4.4, 0.4, 3.6, 0xe0cfae, 0, ttop + 0.2, tz);
+  S.cyl(0, 3.1, 2.6, 4, 0x8c5a3c, 0, ttop + 0.4 + 1.3, tz);
+  S.cyl(0.06, 0.08, 3.2, 6, 0xdddddd, 0, ttop + 0.4 + 2.6 + 1.6, tz);
+  for (const sx of [-9.6, 9.6]){ S.box(1.3, 0.6, 1.3, 0xb7ad9c, sx, PT + 0.3, -2.6); S.ico(0.75, 0x4f8a45, sx, PT + 1.05, -2.6, 0.9); S.box(1.3, 0.6, 1.3, 0xb7ad9c, sx, PT + 0.3, -10); S.ico(0.75, 0x5e9450, sx, PT + 1.05, -10, 0.9); }
+  S.reset(); WL.reset();
+  const [fx, fzz] = W(0, tz); makeFlag(fx, ttop + 0.4 + 2.6 + 3.15, fzz, 2.0, Math.PI / 2);
+  for (const [zz, ry] of [[tz - 1.62, 0], [tz + 1.62, Math.PI]]){
+    const ck = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshLambertMaterial({map: clockTex, transparent: true}));
+    const [a, b] = W(0, zz); ck.position.set(a, 0.8 + 9.6, b); ck.rotation.y = ry; scene.add(ck);
+  }
+  drawClock();
+  const [gx, gz] = W(0, fz - 1.4); label3d('🚆 Mini Şehir Garı', gx, 0.8 + BH + 2.3, gz, '#2f6fb5', '#fff', 1);
+  landmarks['Gar'] = W(0, -6);
+  const np = [[-3, -3], [3, -3], [3, -10], [-3, -10]].map(([a, b]) => W(a, b));
+  npcSpots.push({name: 'Gar Şefi Kemal', x: np[0][0], z: np[0][1], y: PT, path: np, say: ['Hoş geldin! Trenler her gece gelir 🚆', 'Yeni komşular yolda!', "Mini Şehir'e hoş geldin!"]});
+}
+// ---------- arabalar (galeri + garaj) ----------
+const CARS = {
+  klasik: {n: 'Klasik', e: '🚗', c: 60, col: 0x4fb3a8, d: 'Nostaljik, kromlu, beyaz lastikli'},
+  jip: {n: 'Jip', e: '🚙', c: 120, col: 0x46552f, d: 'Arazi canavarı, yedek lastikli'},
+  lux: {n: 'Lüks', e: '🏎️', c: 200, col: 0xb3121f, d: 'Alçak, hızlı, altın jantlı'}
+};
+function drawCar(B, type, ox, oz, r = 0, col, oy = 0){
+  col = col ?? CARS[type].col;
+  const cs = Math.cos(r), sn = Math.sin(r), P = (x, z) => [ox + x * cs + z * sn, oz - x * sn + z * cs];
+  const bx = (w, h, d, c, x, y, z) => { const [a, b] = P(x, z); B.add(GEO.box, c, a, y + oy, b, 0, r, 0, w, h, d); };
+  const wx = (rad, len, c, x, y, z) => { const [a, b] = P(x, z); B.add(cylG(rad, rad, 12), c, a, y + oy, b, 0, r, Math.PI / 2, 1, len, 1); };
+  const wz = (rad, len, c, x, y, z) => { const [a, b] = P(x, z); B.add(cylG(rad, rad, 12), c, a, y + oy, b, 0, r + Math.PI / 2, Math.PI / 2, 1, len, 1); };
+  const GL = 0x26303a, CH = 0xd8dde3, TY = 0x1c1c20;
+  const wheels = (xs, zs, rad, rim) => { for (const x of xs) for (const z of zs){ wx(rad, 0.3, TY, x, rad + 0.06, z); wx(rad * 0.62, 0.32, rim, x, rad + 0.06, z); } };
+  if (type === 'klasik'){
+    bx(1.8, 0.5, 4.4, col, 0, 0.72, 0); for (const z of [1.35, -1.35]) wx(0.5, 1.86, col, 0, 0.66, z);
+    bx(1.46, 0.42, 1.9, GL, 0, 1.18, -0.3); bx(1.56, 0.1, 2.0, 0xf4f1e8, 0, 1.43, -0.3);
+    for (const z of [2.25, -2.25]) bx(1.92, 0.18, 0.18, CH, 0, 0.5, z);
+    bx(0.9, 0.3, 0.06, CH, 0, 0.78, 2.21); for (const x of [-0.62, 0.62]){ wz(0.14, 0.06, 0xfff3cc, x, 0.84, 2.22); bx(0.2, 0.12, 0.05, 0xc0202a, x, 0.82, -2.22); }
+    bx(1.82, 0.05, 4.0, CH, 0, 0.9, 0); wheels([-0.88, 0.88], [-1.35, 1.35], 0.34, 0xffffff);
+  } else if (type === 'jip'){
+    bx(1.95, 0.85, 4.1, col, 0, 1.0, 0); bx(1.85, 0.72, 2.3, GL, 0, 1.78, -0.4); bx(1.97, 0.1, 2.4, col, 0, 2.18, -0.4);
+    for (const x of [-0.8, 0.8]) bx(0.06, 0.08, 2.2, TY, x, 2.3, -0.4); for (const z of [-1.2, 0.4]) bx(1.7, 0.06, 0.08, TY, 0, 2.32, z);
+    for (const x of [-1.0, 1.0]) for (const z of [-1.35, 1.35]) bx(0.12, 0.32, 1.2, TY, x, 0.78, z);
+    bx(1.8, 0.12, 0.12, 0x2a2a30, 0, 0.82, 2.18); bx(1.8, 0.12, 0.12, 0x2a2a30, 0, 1.25, 2.18); for (const x of [-0.6, 0.6]) bx(0.1, 0.55, 0.1, 0x2a2a30, x, 1.03, 2.18);
+    wz(0.44, 0.26, TY, 0, 1.25, -2.2); wz(0.24, 0.28, 0x9aa0a8, 0, 1.25, -2.2);
+    for (const x of [-0.65, 0.65]){ wz(0.15, 0.06, 0xfff3cc, x, 1.18, 2.07); bx(0.2, 0.3, 0.05, 0xc0202a, x, 1.15, -2.07); }
+    wheels([-0.95, 0.95], [-1.35, 1.35], 0.5, 0x9aa0a8);
+  } else {
+    bx(2.0, 0.42, 4.6, col, 0, 0.58, 0); bx(1.9, 0.1, 1.5, col, 0, 0.84, 1.3); bx(1.9, 0.1, 1.1, col, 0, 0.84, -1.6);
+    bx(1.6, 0.4, 1.9, 0x1d232b, 0, 1.0, -0.3); bx(1.5, 0.08, 1.3, col, 0, 1.23, -0.45);
+    bx(2.03, 0.06, 4.2, 0xd4a63a, 0, 0.66, 0);
+    bx(1.9, 0.06, 0.42, TY, 0, 1.15, -2.15); for (const x of [-0.7, 0.7]) bx(0.08, 0.28, 0.08, TY, x, 1.0, -2.15);
+    for (const x of [-0.62, 0.62]) bx(0.55, 0.08, 0.05, 0xfff3cc, x, 0.72, 2.31); bx(1.6, 0.08, 0.05, 0xc0202a, 0, 0.74, -2.31);
+    wheels([-0.95, 0.95], [-1.45, 1.4], 0.38, 0xd4a63a);
+  }
+}
+const GALLERY = {}, SHOWCARS = [];
+const glassMat = new THREE.MeshLambertMaterial({color: 0xcfe9f5, transparent: true, opacity: 0.28, depthWrite: false});
+function buildGallery(cx, cz){
+  GALLERY.x = cx; GALLERY.z = cz + 2;
+  G.box(BLOCK - 3, 0.06, BLOCK - 3, 0xe9e6df, cx, 0.35, cz);
+  for (let k = -5; k <= 5; k++) G.box(0.08, 0.02, BLOCK - 4, 0xd6d1c7, cx + k * 2, 0.39, cz);
+  const BW2 = 20, BD2 = 10, BH2 = 7, bz = cz - 4.5, fz = bz + BD2 / 2, Y = 0.7;
+  S.box(BW2 + 0.6, 0.4, BD2 + 0.6, 0xd9d6d0, cx, 0.5, bz);
+  G.box(BW2 - 0.4, 0.05, BD2 - 0.4, 0xfafaf8, cx, Y + 0.03, bz);
+  S.box(BW2, BH2, 0.4, 0xf4f4f2, cx, Y + BH2 / 2, bz - BD2 / 2 + 0.2);
+  for (const sd of [-1, 1]) S.box(0.4, BH2, BD2, 0xf4f4f2, cx + sd * (BW2 / 2 - 0.2), Y + BH2 / 2, bz);
+  S.box(BW2 + 3, 0.6, BD2 + 3.6, 0xffffff, cx, Y + BH2 + 0.3, bz + 0.8);
+  S.box(BW2 + 3.05, 0.14, 0.12, 0xd4a63a, cx, Y + BH2 + 0.05, bz + BD2 / 2 + 2.6);
+  for (const sd of [-1, 1]) S.cyl(0.24, 0.24, BH2, 14, 0xd8dde3, cx + sd * (BW2 / 2 + 0.6), Y + BH2 / 2, fz + 1.9);
+  for (let k = -5; k <= 5; k++) S.box(0.09, BH2, 0.09, 0x2a2a30, cx + k * 2, Y + BH2 / 2, fz);
+  S.box(BW2, 0.1, 0.1, 0x2a2a30, cx, Y + 3.3, fz);
+  for (const k of [-6, 0, 6]) WL.box(3.2, 0.08, 6, 0xfff4d6, cx + k, Y + BH2 - 0.08, bz);
+  S.box(9, 1.6, 0.12, 0x1d1d22, cx, Y + 4.8, bz - BD2 / 2 + 0.46); WL.box(8.2, 0.14, 0.14, 0xd4a63a, cx, Y + 4.25, bz - BD2 / 2 + 0.5);
+  for (const [dx, t, r, c] of [[-5.5, 'lux', 0.7, 0x1d1d22], [0, 'jip', 0, 0xf2f2f2], [5.5, 'klasik', -0.7, 0xe8d5a8]]){ G.cyl(2.3, 2.3, 0.1, 24, 0xffffff, cx + dx, Y + 0.1, bz + 0.6); drawCar(S, t, cx + dx, bz + 0.6, r, c, Y + 0.15); }
+  S.box(13, 1.7, 0.4, 0x1d1d22, cx, Y + BH2 + 1.45, fz + 2.2); WL.box(12.4, 0.12, 0.12, 0xd4a63a, cx, Y + BH2 + 0.66, fz + 2.42);
+  const gl = new THREE.Mesh(new THREE.PlaneGeometry(BW2 - 0.8, BH2), glassMat); gl.position.set(cx, Y + BH2 / 2, fz); gl.renderOrder = 2; scene.add(gl);
+  label3d('🚗 Mini Şehir Galeri', cx, Y + BH2 + 1.5, fz + 2.6, '#1d1d22', '#ffd56a', 1.1);
+  for (const [dx, t] of [[-7, 'jip'], [0, 'lux'], [7, 'klasik']]){
+    G.cyl(2.75, 2.75, 0.08, 28, 0xd4a63a, cx + dx, 0.4, cz + 6.6);
+    const B = new Bake(); B.cyl(2.55, 2.55, 0.14, 28, 0xf7f7f5, 0, 0.5, 0); drawCar(B, t, 0, 0, 0, undefined, 0.57);
+    const m = new THREE.Mesh(B.geo(), VC()); m.position.set(cx + dx, 0, cz + 6.6); m.rotation.y = dx * 0.3; m.castShadow = true; m.receiveShadow = true; scene.add(m); SHOWCARS.push(m);
+  }
+  for (const sd of [-1, 1]) for (const k of [0, 1, 2]){
+    const x = cx + sd * 11.6, z = cz + 1 + k * 4.5;
+    S.cyl(0.07, 0.09, 7, 6, 0xdddddd, x, 3.8, z); S.box(0.05, 2.6, 0.95, [0xb3121f, 0xd4a63a, 0x1d1d22][k], x, 5.7, z + 0.5);
+  }
+  for (const sd of [-1, 1]){ S.box(0.3, 0.3, 0.3, 0x2a2a30, cx + sd * 3.5, 0.5, cz + 11.2); WL.box(0.2, 0.06, 0.2, 0xfff4d6, cx + sd * 3.5, 0.68, cz + 11.2); }
+  landmarks['Galeri'] = [cx, cz + 3];
+  npcSpots.push({name: 'Satıcı Kerem', x: cx - 9, z: cz + 10.3, path: [[cx - 9, cz + 10.3], [cx + 9, cz + 10.3]], say: ['Hoş geldin! Hangi araba gönlünü çaldı? 🚗', 'Jip mi, lüks mü? 😎', 'Coinini biriktir, gel!', 'Garajına kadar teslim 🔑']});
 }
 const center = Math.floor(N / 2);
 for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
@@ -491,6 +572,7 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
     continue;
   }
   if (i === center && j === center + 1){ buildStation(cx, cz); continue; }
+  if (i === center + 1 && j === center + 1){ buildGallery(cx, cz); continue; }
   if (i === center + 1 && j === center){ // PARK
     G.box(10, 0.05, 8, 0xe8d8a8, cx, 0.36, cz);
     S.box(0.15, 3, 0.15, 0x3f8fbf, cx - 3, 1.8, cz - 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx - 3, 1.8, cz + 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx + 1, 1.8, cz - 1.5); S.box(0.15, 3, 0.15, 0x3f8fbf, cx + 1, 1.8, cz + 1.5);
@@ -615,16 +697,37 @@ function updateLights(t){
 // ---------- ic mekanlar ----------
 const ROOMS = {};
 const BUILDINGS = [];
-function roomShell(x, z, w, d, wallC, floorC, lineC){
-  G.frame(x, z, 0); S.frame(x, z, 0); WL.frame(x, z, 0);
-  G.box(w + 1.4, 0.8, d + 1.4, 0x3a3340, 0, -0.4, 0);
-  G.box(w, 0.3, d, floorC, 0, 0.15, 0);
-  for (let k = -w / 2 + 1; k < w / 2; k += 1) G.box(0.05, 0.02, d, lineC, k, 0.31, 0);
-  S.box(w + 0.6, 3.4, 0.3, wallC, 0, 1.85, -d / 2 - 0.15);
-  for (const sd of [-1, 1]) S.box(0.3, 3.4, d + 0.3, wallC, sd * (w / 2 + 0.15), 1.85, -0.15);
-  S.box(w, 0.25, 0.06, 0x8a6347, 0, 0.42, -d / 2 + 0.03);
-  for (const u of [-w / 3, w / 3]){ S.pl(1.9, 1.4, TRIM, u, 2.3, -d / 2 + 0.01); WL.pl(1.6, 1.15, GLASS, u, 2.3, -d / 2 + 0.03); }
-  G.box(w + 0.6, 0.5, 0.3, 0x5a4f5e, 0, 0.25, d / 2 + 0.15);
+function roomShell(R, o){
+  const {x, z, w, d} = R; G.frame(x, z, 0); S.frame(x, z, 0); WL.frame(x, z, 0);
+  // etraf: cimen, kaldirim, cadde, komsu binalar
+  G.box(w + 72, 0.3, d + 50, 0x9fbf7a, 0, -0.16, 4);
+  G.box(w + 8, 0.1, d + 8, 0xdcd5c6, 0, 0.05, 0);
+  G.box(w + 72, 0.08, 7, 0x3a3a42, 0, 0.04, d / 2 + 8.5);
+  for (let k = -w / 2 - 34; k < w / 2 + 34; k += 4) G.box(1.6, 0.02, 0.18, 0xffffff, k, 0.09, d / 2 + 8.5);
+  G.box(w + 72, 0.1, 3, 0xdcd5c6, 0, 0.05, d / 2 + 13.5);
+  const nb = (bx, bz, bw, bd, bh, c, rc) => {
+    S.box(bw, bh, bd, c, bx, bh / 2, bz); S.box(bw + 0.4, 0.35, bd + 0.4, rc || 0xd8cfc0, bx, bh + 0.17, bz);
+    for (let fy = 2; fy < bh - 1; fy += 2.7) for (let fx = -bw / 2 + 1.4; fx < bw / 2 - 0.9; fx += 2.3){ S.pl(1.3, 1.5, TRIM, bx + fx, fy, bz + bd / 2 + 0.02); WL.pl(1.1, 1.3, GLASS, bx + fx, fy, bz + bd / 2 + 0.04); }
+  };
+  nb(-w / 2 - 7.5, -1, 9, d + 2, o.hl || 9, o.nl || 0xe8cfa8, 0xa0472f); nb(w / 2 + 7.5, -1, 9, d + 2, o.hr || 12, o.nr || 0xc9d6e3, 0x4f6d7a);
+  nb(-w / 4 - 1, -d / 2 - 7.5, w / 2 + 2, 8, 14, 0xd9c2b0); nb(w / 4 + 1.5, -d / 2 - 7.5, w / 2 + 1, 8, 10, 0xe3dccf);
+  for (const sx of [-1, 1]){
+    tree(S, sx * (w / 2 + 2.6), d / 2 + 3.4, 0.9);
+    S.cyl(0.07, 0.09, 4, 6, 0x2a2a30, sx * (w / 2 + 0.9), 2.2, d / 2 + 3.2); S.ico(0.3, 0xfff1c9, sx * (w / 2 + 0.9), 4.3, d / 2 + 3.2);
+    tree(S, sx * (w / 2 + 14), d / 2 + 3.4, 1.1); bush(S, sx * (w / 2 + 1.6), -d / 2 - 1.6, 0.7);
+  }
+  // zemin
+  G.box(w + 1.4, 0.8, d + 1.4, 0x5a4f5e, 0, -0.4, 0);
+  if (o.tiles) for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) G.box(1, 0.3, 1, (i + j) % 2 ? o.tiles[0] : o.tiles[1], -w / 2 + 0.5 + i, 0.15, -d / 2 + 0.5 + j);
+  else { G.box(w, 0.3, d, o.floor, 0, 0.15, 0); for (let k = -w / 2 + 0.8; k < w / 2; k += 0.8) G.box(0.04, 0.02, d, o.line, k, 0.31, 0); }
+  // duvarlar
+  S.box(w + 0.6, 3.6, 0.3, o.wall, 0, 1.95, -d / 2 - 0.15);
+  for (const sd of [-1, 1]) S.box(0.3, 3.6, d + 0.3, o.wall, sd * (w / 2 + 0.15), 1.95, -0.15);
+  if (o.low){ S.box(w, 1.1, 0.05, o.low, 0, 0.85, -d / 2 + 0.03); for (const sd of [-1, 1]) S.box(0.05, 1.1, d, o.low, sd * (w / 2 - 0.02), 0.85, 0); }
+  S.box(w + 0.6, 0.18, 0.4, o.trim || 0xffffff, 0, 3.75, -d / 2 - 0.1);
+  for (const u of [-w / 3, w / 3]){ S.pl(2.1, 1.5, TRIM, u, 2.5, -d / 2 + 0.01); WL.pl(1.8, 1.25, GLASS, u, 2.5, -d / 2 + 0.03); }
+  for (const sd of [-1, 1]) S.box(w / 2 - 1.2, 0.6, 0.3, o.wall, sd * (w / 4 + 0.6), 0.6, d / 2 + 0.15);
+  G.box(2.4, 0.32, 1.2, 0xb7ad9c, 0, 0.16, d / 2 + 0.6);
 }
 function addTable(B, lx, lz, round, seats, col = 0xf2efe6){
   if (round) B.cyl(0.75, 0.75, 0.08, 12, col, lx, 1.12, lz); else B.box(1.4, 0.08, 1.1, col, lx, 1.12, lz);
@@ -633,39 +736,50 @@ function addTable(B, lx, lz, round, seats, col = 0xf2efe6){
     const cx2 = lx + sd * 1.05, ry = sd < 0 ? Math.PI / 2 : -Math.PI / 2;
     B.box(0.55, 0.08, 0.55, 0x8a6347, cx2, 0.84, lz); B.box(0.45, 0.5, 0.45, 0x6e4f36, cx2, 0.55, lz);
     B.box(0.06, 0.65, 0.55, 0x8a6347, cx2 + sd * 0.26, 1.18, lz);
-    seats.push({lx: cx2, lz, dir: ry});
+    seats.push({lx: cx2, lz, dir: ry, tx: lx, tz: lz});
   }
 }
-function makeRoom(name, ox, oz, x, z, icon){
-  const R = {name, x, z, ox, oz, icon, seats: [], w: 14, d: 10}; ROOMS[name] = R; BUILDINGS.push(R); return R;
+function makeRoom(name, ox, oz, x, z, icon, w, d){
+  const R = {name, x, z, ox, oz, icon, seats: [], w, d}; ROOMS[name] = R; BUILDINGS.push(R); return R;
 }
-{ // FIRIN
-  const R = makeRoom('Fırın', -6 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], -40, -700, '🥖'), B = S;
-  roomShell(R.x, R.z, R.w, R.d, 0xf4e3c6, 0xc9a27a, 0xb08a62);
-  B.box(7, 1.1, 0.9, 0x9a6a46, -1, 0.85, -2.6); B.box(7.2, 0.1, 1.05, 0xe8dcc8, -1, 1.45, -2.6); B.box(6, 0.55, 0.7, 0xcfe6ee, -1, 1.78, -2.6);
-  for (let k = 0; k < 9; k++) B.ico(0.22, pick([0xc68a4a, 0xd9a35f, 0xb5763a]), -3.6 + k * 0.65, 1.7, -2.6, 0.6);
-  for (const y of [1.5, 2.4]){ B.box(9, 0.12, 0.6, 0x8a6347, -1.5, y, -4.6); for (let k = 0; k < 12; k++) B.ico(0.28, pick([0xc68a4a, 0xd9a35f, 0xb5763a, 0xe0b878]), -5.6 + k * 0.72, y + 0.25, -4.6, 0.55); }
-  B.box(2.6, 2.8, 1.6, 0xa0523a, 5.2, 1.7, -3.9); B.pl(1.3, 0.85, 0x2a1a14, 5.2, 1.3, -3.08); WL.pl(1.0, 0.6, 0xff8a2a, 5.2, 1.3, -3.06); B.box(0.5, 1.6, 0.5, 0x8a4535, 5.8, 3.6, -4.2);
-  for (const [tx, tz] of [[-4.5, 1.6], [0, 2.8], [4.5, 1.6]]) addTable(B, tx, tz, true, R.seats);
-  for (const [bx, bz] of [[-6.4, -4.2], [6.4, 4.2], [-6.4, 4.2]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
+const wallFlag = (x, y, z, w = 1.8) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w / 1.5), flagMat); m.position.set(x, y, z); scene.add(m); };
+{ // FIRIN: sicak firin, cini zemin, tas firin, ekmek raflari
+  const R = makeRoom('Fırın', -6 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], -120, -700, '🥖', 16, 11), B = S;
+  roomShell(R, {wall: 0xf6e3c0, low: 0xb5763a, trim: 0xc8553d, tiles: [0xd98f5c, 0xf2e2c4], nl: 0xe8cfa8, nr: 0xd6c3e0});
+  const BR = [0xc68a4a, 0xd9a35f, 0xb5763a, 0xe0b878];
+  B.box(9, 1.1, 1.0, 0x9a6a46, -1.5, 0.85, -2.6); B.box(9.2, 0.1, 1.15, 0xe8dcc8, -1.5, 1.45, -2.6); B.box(8, 0.6, 0.8, 0xcfe6ee, -1.5, 1.8, -2.6);
+  for (let k = 0; k < 12; k++) B.ico(0.22, pick(BR), -5.1 + k * 0.65, 1.68, -2.6, 0.6);
+  B.box(0.6, 0.4, 0.4, 0x3a3540, 2.4, 1.7, -2.6);
+  for (const y of [1.5, 2.4, 3.2]){ B.box(10, 0.12, 0.6, 0x8a6347, -2, y, -5.15); for (let k = 0; k < 14; k++) B.ico(0.28, pick(BR), -6.6 + k * 0.72, y + 0.25, -5.15, 0.55); }
+  B.box(3, 3.0, 1.8, 0xa0523a, 6, 1.8, -4.5); B.ico(1.5, 0xb5603f, 6, 3.2, -4.5, 0.55);
+  B.pl(1.4, 0.95, 0x2a1a14, 6, 1.45, -3.58); WL.pl(1.1, 0.7, 0xff8a2a, 6, 1.45, -3.56); B.box(0.6, 2.4, 0.6, 0x8a4535, 6.4, 4.4, -4.9);
+  B.box(1.8, 0.1, 0.5, 0x6b4a3a, 3.6, 1.4, -4.4); B.box(0.1, 0.1, 1.6, 0x6b4a3a, 3.6, 1.45, -3.6);
+  for (const [a, b] of [[7.3, -1.9], [7.3, -1.0], [6.6, -1.45]]){ B.cyl(0.35, 0.42, 0.8, 8, 0xeee4cc, a, 0.7, b); B.box(0.5, 0.06, 0.2, 0x3f8fbf, a, 0.9, b + 0.36); }
+  B.box(0.08, 1.7, 2.8, 0x6b4a3a, -7.94, 2.4, 0.5); B.box(0.06, 1.5, 2.6, 0x2a3a2e, -7.9, 2.4, 0.5);
+  for (let k = 0; k < 4; k++) B.box(0.04, 0.1, 1.6 - k * 0.2, 0xf2f2f2, -7.86, 2.9 - k * 0.32, 0.4);
+  for (const [tx, tz] of [[-5.2, 0.6], [-1.2, 3.4], [2.8, 0.9], [5.4, 3.6]]) addTable(B, tx, tz, true, R.seats);
+  for (const [bx, bz] of [[-7.4, -4.8], [7.4, 4.9], [-7.4, 4.9]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
   S.reset(); G.reset(); WL.reset();
-  R.keeper = {name: 'Fırıncı Hasan', path: [[-4, -3.7], [2.5, -3.7]], say: ['Taze ekmek çıktı! 🍞', 'Sıcak poğaça var 🥐', 'Hoş geldin, ne alırsın?']};
+  R.keeper = {name: 'Fırıncı Hasan', path: [[-5, -3.7], [2.5, -3.7]], say: ['Taze ekmek çıktı! 🍞', 'Sıcak poğaça var 🥐', 'Hoş geldin, ne alırsın?']};
   R.guests = [{name: 'Selma Teyze', seat: 0, say: ['Poğaçalar sıcacık 🥐', 'Bu fırının ekmeği başka', 'Çayım soğumasın']}, {name: 'Öğrenci Efe', seat: 3, say: ['Sınavdan önce simit şart 📚', 'Bir açma daha alayım', 'Wifi şifresi ne abi? 😅']}];
 }
-{ // KAHVEHANE
-  const R = makeRoom('Kahvehane', 6.5 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], -10, -700, '☕'), B = S;
-  roomShell(R.x, R.z, R.w, R.d, 0xdfe8cf, 0xd9cbb0, 0xc2b394);
-  B.box(4.2, 1.1, 0.9, 0x6e4f36, 4.3, 0.85, -3.4); B.box(4.4, 0.1, 1.05, 0xe8dcc8, 4.3, 1.45, -3.4);
-  B.cyl(0.35, 0.42, 0.9, 10, 0xc9ccd2, 3.1, 1.95, -3.4); B.cyl(0.15, 0.3, 0.35, 10, 0xc9ccd2, 3.1, 2.55, -3.4);
-  for (let k = 0; k < 5; k++) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, 4.1 + k * 0.32, 1.6, -3.2);
-  B.box(2.4, 1.4, 0.12, 0x1a1a1f, -3, 2.5, -4.88); WL.pl(2.2, 1.2, 0x3f8fbf, -3, 2.5, -4.8);
-  B.box(1.6, 1.1, 0.06, 0xe30a17, 0, 2.5, -4.97);
-  for (const [tx, tz] of [[-4.2, 0.2], [0.4, 2.6], [4, 0.8]]) addTable(B, tx, tz, false, R.seats, 0xf0ece0);
-  for (const [tx, tz] of [[-4.2, 0.2], [4, 0.8]]){ B.box(0.8, 0.06, 0.5, 0x7a4a2a, tx, 1.19, tz); B.box(0.7, 0.02, 0.4, 0xe8d2a0, tx, 1.23, tz); }
-  for (const [tx, tz] of [[0.4, 2.6], [-4.2, 0.2]]) for (const sd of [-0.35, 0.35]) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, tx + sd, 1.25, tz + 0.35);
-  for (const [bx, bz] of [[-6.4, -4.2], [6.4, 4.2]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
+{ // KAHVEHANE: yesil duvar, ahsap zemin, semaver, tavla, soba, bayrak
+  const R = makeRoom('Kahvehane', 6.5 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], 0, -700, '☕', 16, 11), B = S;
+  roomShell(R, {wall: 0xcfe0c4, low: 0x6e4f36, trim: 0x3f8f6a, floor: 0x7a5a3e, line: 0x5e4430, nl: 0xd9c2b0, nr: 0xe8d8b8, hl: 11, hr: 9});
+  B.box(5, 1.1, 0.9, 0x6e4f36, 4.5, 0.85, -3.4); B.box(5.2, 0.1, 1.05, 0xe8dcc8, 4.5, 1.45, -3.4);
+  B.cyl(0.4, 0.48, 1.0, 10, 0xc9a24a, 2.6, 2.0, -3.4); B.cyl(0.18, 0.34, 0.4, 10, 0xc9a24a, 2.6, 2.7, -3.4); B.cyl(0.22, 0.25, 0.3, 10, 0xf2f2f2, 2.6, 3.05, -3.4);
+  for (let k = 0; k < 7; k++) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, 3.6 + k * 0.32, 1.6, -3.2);
+  B.box(4.4, 0.1, 0.4, 0x6e4f36, 4.5, 2.6, -5.3); for (let k = 0; k < 8; k++) B.cyl(0.1, 0.1, 0.3, 8, pick([0xe8e0d0, 0x3f8f6a, 0xb5452a]), 2.7 + k * 0.5, 2.8, -5.3);
+  B.box(2.6, 1.5, 0.12, 0x1a1a1f, -2.2, 2.8, -5.38); WL.pl(2.4, 1.3, 0x3f8fbf, -2.2, 2.8, -5.31);
+  B.cyl(0.45, 0.45, 1.1, 10, 0x2a2a30, -6.8, 0.85, -3.6); B.cyl(0.1, 0.1, 2.8, 6, 0x3a3a40, -6.8, 2.8, -3.6); B.box(0.2, 0.2, 1.7, 0x3a3a40, -6.8, 4.1, -4.4);
+  for (const [z, c] of [[-1, 0x8a6347], [1.8, 0x5d7f5a], [4, 0x3d6aa8]]){ B.box(0.06, 1.0, 1.3, 0x6b4a3a, 7.92, 2.5, z); B.box(0.05, 0.85, 1.12, c, 7.88, 2.5, z); }
+  B.box(0.06, 0.9, 1.2, 0x6b4a3a, -7.92, 2.6, 2); B.box(0.05, 0.75, 1.0, 0xd9a35f, -7.88, 2.6, 2);
+  for (const [tx, tz] of [[-4.6, -0.2], [-0.4, 2.8], [3.8, 0.6], [-4.6, 3.8]]){ addTable(B, tx, tz, false, R.seats, 0xf0ece0); B.box(0.8, 0.06, 0.5, 0x7a4a2a, tx, 1.19, tz); B.box(0.7, 0.02, 0.4, 0xe8d2a0, tx, 1.23, tz); }
+  for (const [tx, tz] of [[-0.4, 2.8], [-4.6, -0.2]]) for (const sd of [-0.35, 0.35]) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, tx + sd, 1.27, tz + 0.38);
+  for (const [bx, bz] of [[7.4, -4.8], [7.4, 4.9]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
   S.reset(); G.reset(); WL.reset();
-  R.keeper = {name: 'Kahveci Rıza', path: [[2.6, -4.3], [6.2, -4.3]], say: ['Çaylar geliyor ☕', 'Orta şekerli kahve?', 'Otur, yorgunluk çayı benden']};
+  wallFlag(R.x - 5.2, 2.9, R.z - 5.46, 1.9);
+  R.keeper = {name: 'Kahveci Rıza', path: [[2.4, -4.6], [6.6, -4.6]], say: ['Çaylar geliyor ☕', 'Orta şekerli kahve?', 'Otur, yorgunluk çayı benden']};
   R.guests = [{name: 'Necati Amca', seat: 0, say: ['Hamle sende Ziya! 🎲', 'Şeş beş!', 'Rıza, iki çay!']}, {name: 'Ziya Amca', seat: 1, say: ['Dur, düşünüyorum…', 'Mars oldun Necati! 😄', 'Bu oyun bende']}, {name: 'Bahar Abla', seat: 4, say: ['Burası mahallenin kalbi', 'Çay tavşan kanı ☕', 'Maç kaçta başlıyor?']}];
 }
 for (const R of Object.values(ROOMS)){
@@ -674,8 +788,8 @@ for (const R of Object.values(ROOMS)){
   R.guests.forEach(g => npcSpots.push({name: g.name, say: g.say, room: R.name, sit: R.seats[g.seat], x: R.seats[g.seat].x, z: R.seats[g.seat].z}));
 }
 { // EV ICI (sablon oda)
-  const R = {name: 'Ev', x: 20, z: -700, w: 12, d: 9, icon: '🏠', seats: []}; ROOMS.Ev = R;
-  roomShell(R.x, R.z, R.w, R.d, 0xf3ece0, 0xc9a27a, 0xb08a62);
+  const R = {name: 'Ev', x: 120, z: -700, w: 12, d: 9, icon: '🏠', seats: []}; ROOMS.Ev = R;
+  roomShell(R, {wall: 0xf3ece0, low: 0xd9cbb0, floor: 0xc9a27a, line: 0xb08a62, nl: 0xf0d9c0, nr: 0xd0dccb});
   addTable(S, 3.6, 2.4, true, R.seats); S.box(1.0, 2.2, 0.08, 0x6b4a3a, -4.4, 1.4, -4.46);
   S.reset(); G.reset(); WL.reset();
 }
@@ -912,6 +1026,12 @@ function tap(x, y){
   let best = -1, bd = 46 * 46;
   people.list.forEach((p, i) => { for (const h of [0.9, 1.9]){ const s = scr(p.pos.x, h * p.s, p.pos.z); if (!s) continue; const d = (s[0] - x) ** 2 + (s[1] - y) ** 2; if (d < bd){ bd = d; best = i; } } });
   if (best >= 0){ react(best); return; }
+  if (inside){
+    const Rm = ROOMS[inside], taken = new Set(people.list.filter(q => q.sit).map(q => q.sit)); let bs = null, bd3 = 70 * 70;
+    Rm.seats.forEach(st => { if (taken.has(st)) return; const s3 = scr(st.x, 1, st.z); if (!s3) return; const d = (s3[0] - x) ** 2 + (s3[1] - y) ** 2; if (d < bd3){ bd3 = d; bs = st; } });
+    if (bs) sitAt(bs); return;
+  }
+  if (GALLERY.x !== undefined){ const sg = scr(GALLERY.x, 3, GALLERY.z); if (sg && (sg[0] - x) ** 2 + (sg[1] - y) ** 2 < 110 * 110){ showGallery(); return; } }
   if (!inside){ let bb = null, bd2 = 80 * 80; BUILDINGS.forEach(b => { const s2 = scr(b.ox, 3, b.oz); if (!s2) return; const d = (s2[0] - x) ** 2 + (s2[1] - y) ** 2; if (d < bd2){ bd2 = d; bb = b; } }); if (bb){ showBuilding(bb.name); return; } }
   if (inside) return;
   let lb = null; bd = 70 * 70;
@@ -939,7 +1059,7 @@ function updateSky(){
   winLit.emissive.setRGB(1.0, 0.72, 0.38).multiplyScalar(Math.max(0, nightK - 0.3) * 1.2);
   winDark.emissive.setRGB(0.1, 0.12, 0.2).multiplyScalar(nightK);
   renderer.shadowMap.needsUpdate = true;
-  if (inside){ scene.background = new THREE.Color(0x2b2533); scene.fog.color.set(0x2b2533); hemi.intensity = 1.15; sun.intensity = 1.5; }
+  if (inside){ hemi.intensity = Math.max(hemi.intensity, 0.95); sun.intensity = Math.max(sun.intensity, 1.3); }
 }
 
 // ---------- kamera hareketleri ----------
@@ -965,19 +1085,59 @@ function enterRoom(name){
     const p = people.list[mi], taken = new Set(people.list.filter(q => q.sit).map(q => q.sit)), seat = R.seats.find(st => !taken.has(st));
     if (seat){ p.prevPos = p.pos.clone(); p.sit = seat; p.room = name; p.dir = seat.dir; p.q = []; p.jump = 0.55; toast(`@${me} içeri girdi`); }
   }
-  const hf = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect), dd = Math.max(20, (R.w / 2 + 1.2) / Math.tan(hf / 2));
+  const vf = camera.fov * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect), dd = Math.max((R.w / 2 + 0.6) / Math.tan(hf / 2), (R.d / 2 + 1.0) / Math.tan(vf / 2) * 0.95) * 1.3;
   flyToPos(new THREE.Vector3(R.x, dd * 0.82, R.z + dd * 0.55), new THREE.Vector3(R.x, 0, R.z));
+  $('orderbtn').style.display = MENU[name] ? '' : 'none';
   $('intitle').textContent = name === 'Ev' ? R.title : `${R.icon} ${name} · ${roomPeople(name).length} kişi`; $('inbar').classList.add('show'); document.body.classList.add('inroom');
   updateSky();
 }
 function exitRoom(){
   if (!inside) return; const R = ROOMS[inside];
+  orderSprites.forEach(s2 => scene.remove(s2)); orderSprites = [];
   people.list.forEach(p => { if (!p.npc && !p.worker && p.room === inside){ p.sit = null; p.room = null; p.pos.copy(p.home); p.tgt.copy(p.home); p.inG = false; p.q = []; } });
   inside = null; $('inbar').classList.remove('show'); document.body.classList.remove('inroom'); updateSky();
   if (R === ROOMS.Ev){ if (furn){ scene.remove(furn); furn.geometry.dispose(); furn = null; } camera.position.set(R.ox + 20, 24, R.oz + 34); controls.target.set(R.ox, 0, R.oz); flyTo(R.ox, R.oz, 22, 18, 900, R.ory); return; }
   camera.position.set(R.ox + 20, 24, R.oz + 34); controls.target.set(R.ox, 0, R.oz); flyTo(R.ox, R.oz, 28, 20, 900);
 }
 $('exitbtn').onclick = exitRoom;
+$('orderbtn').onclick = () => showMenu();
+const MENU = {
+  'Fırın': [['simit', '🥯', 'Simit', 2], ['pogaca', '🥐', 'Poğaça', 2], ['acma', '🥨', 'Açma', 3], ['borek', '🥧', 'Börek', 4], ['pasta', '🍰', 'Pasta', 6]],
+  'Kahvehane': [['cay', '🍵', 'Çay', 1], ['kahve', '☕', 'Türk kahvesi', 3], ['oralet', '🧃', 'Oralet', 1], ['sahlep', '🥛', 'Sahlep', 3], ['tost', '🥪', 'Tost', 4]]
+};
+let orderSprites = [];
+function sitAt(st){
+  const p = people.list.find(q => q.r && q.r.u === getMe());
+  if (!p){ toast('Oturmak için önce evini sahiplen 🔑 (kendi adını ara)', 3200); return; }
+  if (p.worker){ toast('Çalışırken oturamazsın 💼'); return; }
+  if (!p.prevPos) p.prevPos = p.pos.clone();
+  p.sit = st; p.room = inside; p.dir = st.dir; p.q = []; p.jump = 0.55; bubble(p, 'Burası güzel 😊');
+  if (MENU[inside]) setTimeout(() => toast('Sipariş vermek için 🍽️ Sipariş düğmesine bas'), 900);
+}
+function showMenu(){
+  const place = inside; if (!MENU[place]) return;
+  openCard(`<h2>${ROOMS[place].icon} ${place} menüsü</h2><p>${ME.u ? `Sende 🪙 <b>${MYP ? MYP.coins : 0}</b> coin. ` : ''}Siparişin masana gelir.</p>
+  <div class="grid">${MENU[place].map(([k, e, n, c]) => `<button class="btn it" data-i="${k}"><b>${e}</b>${n}<br><small>🪙 ${c}</small></button>`).join('')}</div>`);
+  document.querySelectorAll('#cardbody .it').forEach(b => b.onclick = () => orderItem(place, b.dataset.i));
+}
+async function orderItem(place, k){
+  const it = MENU[place].find(x => x[0] === k); if (!it) return; const [, e, n] = it;
+  if (!ME.u){ toast('Sipariş için önce evini sahiplen 🔑 (kendi adını ara)', 3500); return; }
+  if (working()){ toast('Çalışırken sipariş veremezsin 💼'); return; }
+  const p = meP(); if (!p || !p.sit || p.room !== place){ $('card').classList.remove('show'); toast('Önce boş bir sandalyeye dokunup otur 🪑', 3200); return; }
+  try {
+    const {data, error} = await sb.rpc('order_item', {p_place: place, p_item: k}); if (error) throw error;
+    if (!data.ok){ toast({coin_yetmez: `Coin yetmiyor: ${data.need} lazım. Çalışarak kazan 💼`, calisiyor: 'Çalışırken sipariş veremezsin 💼', once_sahiplen: 'Önce evini sahiplen 🔑'}[data.err] || 'Olmadı, tekrar dene', 3200); return; }
+    MYP.coins = data.coins; updateMeUI(); $('card').classList.remove('show');
+    const R = ROOMS[place], kp = people.list.find(q => q.npc && q.name === R.keeper.name);
+    if (kp) bubble(kp, `${e} Hemen geliyor!`);
+    setTimeout(() => {
+      const st = p.sit; if (!st || inside !== place) return;
+      const s2 = label3d(e, R.x + st.tx + (st.lx - st.tx) * 0.45, 1.75, R.z + st.tz, 'rgba(255,255,255,.92)', '#000', 0.75); orderSprites.push(s2);
+      bubble(p, `${e} Afiyet olsun bana! 😋`); toast(`${e} ${n} masana geldi!`);
+    }, 1400);
+  } catch(err){ toast('Bağlantı sorunu'); }
+}
 function roomChatter(dt){
   if (!inside || (chatT += dt) < 3.2) return; chatT = 0;
   const occ = roomPeople(inside).filter(p => !p.bub); if (!occ.length) return;
@@ -1201,15 +1361,41 @@ function buildDeco(){
   residents.forEach(r => {
     const own = ownedOf(r.u), L = r.lot; if (!own.length || !L || L.owner !== r.idx || !L.h) return;
     const bd = -L.h.d / 2; B.frame(L.x, L.z, L.ry);
+    const car = ['lux', 'jip', 'klasik'].find(k => own.includes(k));
+    if (car){
+      const sg = L.h.dx > 0 ? -1 : 1, gx = sg * 1.75, gz = FZ - 1.45;
+      B.box(4.9, 0.05, 2.5, 0xb7b2a8, gx, 0.36, gz);
+      for (const a of [-2.3, 2.3]) for (const b of [-1.15, 1.15]) B.box(0.12, 2.5, 0.12, 0xf2f2f2, gx + a, 1.6, gz + b);
+      B.box(5.1, 0.14, 2.7, 0x5a5f66, gx, 2.9, gz); B.box(5.15, 0.05, 2.75, 0xd4a63a, gx, 2.84, gz);
+      drawCar(B, car, gx, gz, sg > 0 ? Math.PI / 2 : -Math.PI / 2, undefined, 0.38);
+    }
     if (own.includes('cicek')) for (let k = 0; k < 7; k++){ const u = -LW / 2 + 0.5 + k * 0.42; if (Math.abs(u - L.h.dx) < 0.9) continue; B.box(0.06, 0.3, 0.06, 0x3f7a40, u, 0.5, FZ - 0.5); B.ico(0.14, [0xe24f4f, 0xf4c542, 0xf3a0c0, 0xffffff, 0xb07ad8][k % 5], u, 0.7, FZ - 0.5); }
-    if (own.includes('bank')){ const bx = L.h.dx > 0 ? -2.3 : 2.3; B.box(1.4, 0.08, 0.45, 0x8a6347, bx, 0.75, FZ - 1.3); B.box(1.4, 0.4, 0.06, 0x8a6347, bx, 1.0, FZ - 1.5); for (const sd of [-0.6, 0.6]) B.box(0.06, 0.4, 0.4, 0x2a2a30, bx + sd, 0.55, FZ - 1.3); }
-    if (own.includes('fener')){ const fx = L.h.dx > 0 ? -3.4 : 3.4; B.cyl(0.05, 0.07, 1.8, 6, 0x2a2230, fx, 1.2, FZ - 0.4); B.box(0.3, 0.36, 0.3, 0xffe3a0, fx, 2.2, FZ - 0.4); }
+    if (own.includes('bank') && !car){ const bx = L.h.dx > 0 ? -2.3 : 2.3; B.box(1.4, 0.08, 0.45, 0x8a6347, bx, 0.75, FZ - 1.3); B.box(1.4, 0.4, 0.06, 0x8a6347, bx, 1.0, FZ - 1.5); for (const sd of [-0.6, 0.6]) B.box(0.06, 0.4, 0.4, 0x2a2a30, bx + sd, 0.55, FZ - 1.3); }
+    if (own.includes('fener') && !car){ const fx = L.h.dx > 0 ? -3.4 : 3.4; B.cyl(0.05, 0.07, 1.8, 6, 0x2a2230, fx, 1.2, FZ - 0.4); B.box(0.3, 0.36, 0.3, 0xffe3a0, fx, 2.2, FZ - 0.4); }
     if (own.includes('agac')){ B.cyl(0.14, 0.18, 1.6, 6, 0x6b4a32, -2.8, 1.1, bd - 1.3); B.ico(1.05, 0x4f8a45, -2.8, 2.6, bd - 1.3, 1.1); }
     if (own.includes('cesme')){ B.cyl(0.7, 0.8, 0.4, 12, 0xd8ccb6, 2.7, 0.5, bd - 1.3); B.cyl(0.58, 0.58, 0.05, 12, 0x6fc6d0, 2.7, 0.72, bd - 1.3); B.cyl(0.1, 0.12, 0.8, 8, 0xd8ccb6, 2.7, 0.9, bd - 1.3); B.ico(0.18, 0x9fe0ea, 2.7, 1.35, bd - 1.3); }
     if (own.includes('havuz')){ B.box(2.3, 0.2, 1.5, 0xe8e0d0, 0, 0.4, bd - 1.35); B.box(2.0, 0.05, 1.2, 0x3fb6d8, 0, 0.52, bd - 1.35); }
     if (own.includes('bayrak')){ const px = L.h.dx > 0 ? -3.1 : 3.1; B.cyl(0.05, 0.06, 4.6, 6, 0xdddddd, px, 2.6, FZ - 0.9); const [fx, fz] = lw(L, px, FZ - 0.9); decoFlags.push(makeFlag(fx, 4.85, fz, 1.2, L.ry + Math.PI / 2)); }
   });
   B.reset(); decoMesh = B.build(VC(), true, true); renderer.shadowMap.needsUpdate = true;
+}
+// galeri
+function showGallery(){
+  const own = ME.u ? ownedOf(ME.u) : [];
+  openCard(`<h2>🚗 Mini Şehir Galeri</h2><p>Arabanı al, evinin önündeki garaja park edilsin. ${ME.u ? `Sende 🪙 <b>${MYP ? MYP.coins : 0}</b> coin.` : 'Satın almak için önce evini sahiplen 🔑'}</p>
+  <div class="grid">${Object.entries(CARS).map(([k, c]) => `<button class="btn it ${own.includes(k) ? 'own' : ''}" data-i="${k}"><b>${c.e}</b>${c.n}<br><small>${own.includes(k) ? '✓ Senin' : '🪙 ' + c.c}</small></button>`).join('')}</div>
+  <p style="font-size:12px;margin-top:8px">${Object.values(CARS).map(c => `${c.e} <b>${c.n}</b>: ${c.d}`).join('<br>')}</p>`);
+  document.querySelectorAll('#cardbody .it').forEach(b => b.onclick = async () => {
+    const k = b.dataset.i, c = CARS[k];
+    if (!ME.u){ toast('Araba almak için önce evini sahiplen 🔑 (kendi adını ara)', 3500); return; }
+    if (own.includes(k)){ toast('Bu araba zaten senin, garajında 🚗'); return; }
+    try {
+      const {data, error} = await sb.rpc('buy_item', {p_item: k}); if (error) throw error;
+      if (!data.ok){ toast({coin_yetmez: `Coin yetmiyor: ${data.need} lazım. Çalışarak kazan 💼`, zaten: 'Bu araba zaten senin'}[data.err] || 'Olmadı', 3500); return; }
+      MYP.coins = data.coins; MYP.owned = data.owned; const pr = PROF.get(ME.u) || {u: ME.u}; pr.owned = data.owned; PROF.set(ME.u, pr);
+      buildDeco(); updateMeUI(); toast(`${c.e} ${c.n} senin! Garajına park edildi 🔑`, 3500); showGallery();
+    } catch(e){ toast('Bağlantı sorunu'); }
+  });
 }
 // ev ici
 let furn = null;
@@ -1267,12 +1453,12 @@ function startArrival(){
   const forced = params.has('gar');
   if (seen === null && !forced) return;
   const news = people.list.filter(p => p.r && !p.founder && (forced ? p.r.idx >= maxIdx - 3 : p.r.idx > +seen)).slice(-6); if (!news.length) return;
-  const {cx, cz} = STATION, Lz = LINES.reduce((a, b) => Math.abs(b - (cz - 13)) < Math.abs(a - (cz - 13)) ? b : a), PT = 1.3;
+  const {cx, cz, W} = STATION, front = W(0, -13)[1], Lz = LINES.reduce((a, b) => Math.abs(b - front) < Math.abs(a - front) ? b : a), PT = 1.3, Q = (lx, lz, y) => { const [a, b] = W(lx, lz); return {x: a, z: b, y}; };
   news.forEach((p, k) => {
     const sx = k % 2 ? 6 : -6, hx = p.home.x, hz = p.home.z;
-    const Xv = LINES.reduce((a, b) => Math.abs(b - hx) < Math.abs(a - hx) ? b : a), sg = Math.sign(hx - Xv) || 1, ex = Xv + sg * 3.6, ez = Lz + 3.6;
-    p.pos.set(cx + sx, 0, cz - 8.7); p.yb = 0.3; p.inG = false; p.arriving = true; p.speed = 2.3; p.wait = k * 1.6; p.sit = null;
-    p.q = [{x: cx + sx, z: cz - 4.6, y: PT}, {x: cx, z: cz - 4.6, y: PT}, {x: cx, z: cz - 10.9, y: PT}, {x: cx, z: cz - 12.9, y: 0.3}, {x: cx, z: ez, y: 0.3}, {x: ex, z: ez, y: 0.3}, {x: ex, z: hz, y: 0.3}, {x: hx, z: hz, y: 0.3}];
+    const Xv = LINES.reduce((a, b) => Math.abs(b - hx) < Math.abs(a - hx) ? b : a), sg = Math.sign(hx - Xv) || 1, ex = Xv + sg * 3.6, ez = Lz + Math.sign(cz - Lz) * 3.6;
+    const st0 = Q(sx, -8.7); p.pos.set(st0.x, 0, st0.z); p.yb = 0.3; p.inG = false; p.arriving = true; p.speed = 2.3; p.wait = k * 1.6; p.sit = null;
+    p.q = [Q(sx, -4.6, PT), Q(0, -4.6, PT), Q(0, -10.9, PT), Q(0, -12.9, 0.3), {x: cx, z: ez, y: 0.3}, {x: ex, z: ez, y: 0.3}, {x: ex, z: hz, y: 0.3}, {x: hx, z: hz, y: 0.3}];
     newTarget(p);
   });
   setTimeout(() => toast(`🚆 ${news.length} yeni komşu trenle geldi! Gar'a bak`, 4000), 2500);
@@ -1365,9 +1551,25 @@ async function showAdmin(){
   <h3>Sakin yönet</h3><input class="f" id="mu" placeholder="@kullanıcıadı" autocapitalize="off">
   <div class="row"><button class="sec btn" id="mgo">Evine git</button><button class="sec btn" id="mban">Engelle</button></div>
   <div class="row"><button class="sec btn" id="munban">Engeli kaldır</button><button class="sec btn" id="mreset">Sahipliği sıfırla</button></div>
-  <div class="row"><input class="f" id="mcn" type="number" inputmode="numeric" value="50" style="flex:1;margin:0"><button class="sec btn" id="mcoin">🪙 Coin ver</button></div>
+  <h3>Coin yönetimi</h3><p id="cbal">Yukarıya kullanıcı adı yaz ya da listeden seç.</p>
+  <div class="row"><input class="f" id="mcn" type="number" inputmode="numeric" value="50" style="flex:1;margin:0;min-width:60px"><button class="sec btn" id="mcoin">➕ Ver</button><button class="sec btn" id="mcoinm">➖ Geri al</button></div>
+  <div class="row"><button class="sec btn" id="mbal">🔍 Coinine bak</button></div>
+  <h3>Coin listesi</h3><ul class="nl" id="clist"><li>Yükleniyor…</li></ul>
   <div class="row"><button class="sec btn" id="alogout">Çıkış</button></div></div>`);
-  $('mcoin').onclick = async () => { const u = mu(); if (!u) return; const {data, error} = await sb.rpc('admin_coins', {p_u: u, p_n: parseInt($('mcn').value) || 0}); toast(error || data === null ? 'Olmadı' : `@${u} artık ${data} coin`); };
+  const loadCList = async () => {
+    const {data} = await sb.from('profiles').select('u,coins').order('coins', {ascending: false}).limit(50);
+    $('clist').innerHTML = (data || []).length ? data.map(r => `<li data-u="${esc(r.u)}" style="cursor:pointer">@${esc(r.u)} · 🪙 <b>${r.coins}</b></li>`).join('') : '<li>Henüz kimsenin coini yok</li>';
+    document.querySelectorAll('#clist li[data-u]').forEach(li => li.onclick = () => { $('mu').value = li.dataset.u; $('mbal').click(); });
+  };
+  const coinDo = async n => {
+    const u = mu(); if (!u){ toast('Önce kullanıcı adı yaz'); return; } if (!n){ toast('Miktar yaz'); return; }
+    const {data, error} = await sb.rpc('admin_coins', {p_u: u, p_n: n}); if (error || data === null){ toast('Olmadı: bu kişi şehirde mi?'); return; }
+    $('cbal').innerHTML = `@${esc(u)}: 🪙 <b>${data}</b> coin`; toast(n > 0 ? `@${u} kişisine ${n} coin verildi` : `@${u} kişisinden ${-n} coin geri alındı`); loadCList();
+  };
+  $('mcoin').onclick = () => coinDo(Math.abs(parseInt($('mcn').value) || 0));
+  $('mcoinm').onclick = () => coinDo(-Math.abs(parseInt($('mcn').value) || 0));
+  $('mbal').onclick = async () => { const u = mu(); if (!u){ toast('Önce kullanıcı adı yaz'); return; } const {data} = await sb.from('profiles').select('coins,owned').eq('u', u).maybeSingle(); $('cbal').innerHTML = data ? `@${esc(u)}: 🪙 <b>${data.coins}</b> coin · ${(data.owned || []).length} eşya` : `@${esc(u)}: 🪙 <b>0</b> coin`; };
+  loadCList();
   document.querySelectorAll('.seg button').forEach(b => b.onclick = async () => {
     const m = b.dataset.m; const {error} = await sb.from('settings').upsert({key: 'time_mode', value: m});
     if (error){ toast('Kaydedilemedi'); return; } SETTINGS.time_mode = m; updateSky(); toast('Saat ayarı herkes için güncellendi'); showAdmin();
@@ -1409,7 +1611,7 @@ function buildMenu(){
 }
 
 // ---------- sinema modu (video cekimi icin) ----------
-window.cine = { showEditor, showShop, startWork, enterHouse, showTop, startArrival, houseTag, buildDeco, PROF, STATION, VEH, lots, residents: () => residents, setMe(o){ ME = o.ME || ME; MYP = o.MYP || MYP; updateMeUI(); updateWorkbar(); }, showAdmin, showClaim, flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
+window.cine = { showGallery, showMenu, sitAt, GALLERY, ROOMS, showEditor, showShop, startWork, enterHouse, showTop, startArrival, houseTag, buildDeco, PROF, STATION, VEH, lots, residents: () => residents, setMe(o){ ME = o.ME || ME; MYP = o.MYP || MYP; updateMeUI(); updateWorkbar(); }, showAdmin, showClaim, flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
 
 // ---------- dongu ----------
 function resize(){ const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.8 ? 48 : 38; camera.updateProjectionMatrix(); }
@@ -1423,7 +1625,7 @@ let last = performance.now(), fpsN = 0, fpsT = 0;
 function loop(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   updateFly(); controls.update(); updatePeople(dt, now);
-  const ts = now / 1000; updateTraffic(dt, ts); updateLights(ts); updateFlags(ts);
+  const ts = now / 1000; updateTraffic(dt, ts); for (const m of SHOWCARS) m.rotation.y += dt * 0.35; updateLights(ts); updateFlags(ts);
   if (htag){ htag.t -= dt; htag.s.material.opacity = Math.min(1, htag.t); if (htag.t <= 0){ scene.remove(htag.s); htag = null; } }
   if ((lblT += dt) > 0.25){ lblT = 0; updateLabels(); }
   roomChatter(dt);
