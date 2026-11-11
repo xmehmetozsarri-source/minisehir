@@ -41,6 +41,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f3ead8;font-family:-a
 .row{display:flex;gap:8px;margin-top:8px}
 .row a,.row button{flex:1;text-align:center;border-radius:12px;padding:11px;font-weight:700;font-size:14px;text-decoration:none}
 .pri{background:var(--accent);color:#fff}.sec{background:#efe7d8;color:var(--ink)}
+#inbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 92px);z-index:6;display:none;gap:8px;align-items:center;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:14px;padding:6px 6px 6px 12px;box-shadow:0 2px 12px rgba(0,0,0,.15);font-size:13px;white-space:nowrap}
+#inbar.show{display:flex}
+#inbar button{background:var(--ink);color:#fff;border-radius:10px;padding:7px 11px;font-weight:700;font-size:12.5px}
+body.cine #inbar{display:none!important}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(42,34,48,.92);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:80%}
 #toast.show{opacity:1}
 #load{position:fixed;inset:0;background:#f3ead8;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
@@ -54,7 +58,7 @@ body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!imp
 <canvas id="c"></canvas>
 <div id="load"><h1>Bizim Sokak</h1><p>Mahalle uyanıyor…</p></div>
 <div class="brand"><h1>Bizim Sokak</h1><small>@bizimsokak.tr · herkese bir ev</small>
-  <div class="goal"><div class="bar"><i id="goalbar"></i></div><span id="goaltxt">Ev sahipliği 1000 takipçide açılıyor</span></div></div>
+  <div class="goal"><span id="goaltxt">Takip et, son videoya “ev” yaz → evin hazır</span></div></div>
 <div class="hud">
   <div class="chip">Nüfus: <b id="pop">0</b></div>
   <div class="chip"><span id="day">Gün 1</span> · <b id="clock">00:00</b></div>
@@ -62,6 +66,7 @@ body.cine .hud,body.cine .brand,body.cine .find,body.cine #card{display:none!imp
   <div id="menu"></div>
 </div>
 <div class="find"><input id="q" placeholder="Sakini bul: @kullanıcıadı" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" id="go">Bul</button></div>
+<div id="inbar"><span id="intitle"></span><button class="btn" id="exitbtn">← Dışarı çık</button></div>
 <div id="card"><button class="x btn" id="cx">×</button><div id="cardbody"></div></div>
 <div id="toast"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
@@ -72,7 +77,6 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
 const START = new Date('2026-11-11T00:00:00+03:00');
 const IG = 'https://www.instagram.com/bizimsokak.tr/';
-const GOAL = 1000;
 const params = new URLSearchParams(location.search);
 const CINE = params.has('cine');
 if (CINE) document.body.classList.add('cine');
@@ -330,7 +334,7 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
     for (const r of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) bench(S, cx + Math.sin(r) * 7.5, cz + Math.cos(r) * 7.5, r + Math.PI);
     for (const [a, b] of [[-3, -8], [3, -8], [-3, 8], [3, 8], [-8, -3], [-8, 3], [8, -3], [8, 3]]) for (let f = 0; f < 3; f++) S.box(0.3, 0.3, 0.3, pick([0xe24f4f, 0xf4c542, 0xf3a0c0, 0xffffff]), cx + a + (rnd() - .5), 0.5, cz + b + (rnd() - .5));
     landmarks['Meydan'] = [cx, cz]; label3d('Meydan', cx, 7.5, cz, '#ff8a2a');
-    npcSpots.push({name: 'Simitçi Ali', x: cx, z: cz, r: 10, say: ['Simiiit! Taze simit! 🥯', 'Susamlı simit, sıcacık', 'Çayın yanına simit? 😄']});
+    npcSpots.push({name: 'Simitçi Ali', x: cx, z: cz + 6.2, path: Array.from({length: 16}, (_, k) => [cx + Math.sin(k / 16 * Math.PI * 2) * 6.2, cz + Math.cos(k / 16 * Math.PI * 2) * 6.2]), say: ['Simiiit! Taze simit! 🥯', 'Susamlı simit, sıcacık', 'Çayın yanına simit? 😄']});
     continue;
   }
   G.box(BLOCK - 3, 0.04, BLOCK - 3, GRASS, cx, 0.32, cz);
@@ -343,8 +347,6 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
     for (const s of [-3, 0, 3]){ S.cyl(0.6, 0.6, 0.08, 10, 0xf2efe6, cx + 6.5 + s, 1.15, cz + 10.6); S.cyl(0.08, 0.08, 0.8, 6, 0x3a3540, cx + 6.5 + s, 0.75, cz + 10.6); for (const t of [-1, 1]) S.cyl(0.25, 0.25, 0.5, 8, 0x8a6347, cx + 6.5 + s + t * 0.9, 0.6, cz + 10.6); }
     landmarks['Kahvehane'] = [cx + 6.5, cz + 4]; label3d('Kahvehane', cx + 6.5, 7.6, cz + 4, '#4f6d7a');
     for (const s of [-1, 1]) tree(S, cx + s * 10, cz - 7, 1);
-    npcSpots.push({name: 'Fırıncı Hasan', x: cx - 6, z: cz + 10.5, r: 2.5, say: ['Taze ekmek çıktı! 🍞', 'Sıcak poğaça var 🥐', 'Hayırlı sabahlar komşu!']});
-    npcSpots.push({name: 'Kahveci Rıza', x: cx + 6.5, z: cz + 11.5, r: 3, say: ['Bir orta şekerli? ☕', 'Tavla atalım mı? 🎲', 'Otur, yorgunluk kahvesi benden']});
     continue;
   }
   if (i === center && j === N - 1){ // CAY BAHCESI
@@ -357,7 +359,7 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
     buildHouse(cx + 10, cz - 9, 0, rnd, {w: 4, d: 3.4, floors: 1, wall: 0xfaf6ee, roof: 0x3f8fbf, doorX: 0, shop: true});
     for (const s of [-1, 1]) tree(S, cx + s * 11, cz + 9, 0.9);
     landmarks['Çay Bahçesi'] = [cx, cz]; label3d('Çay Bahçesi', cx, 6.8, cz, '#3f8fbf');
-    npcSpots.push({name: 'Çaycı Ayten', x: cx, z: cz, r: 8, say: ['Çay taze, demli ☕', 'Deniz manzaralı masa boş 🌊', 'Açık mı demli mi?']});
+    npcSpots.push({name: 'Çaycı Ayten', x: cx - 10, z: cz - 2.5, path: [[cx - 10, cz - 2.5], [cx + 10, cz - 2.5], [cx + 10, cz + 2.5], [cx - 10, cz + 2.5]], say: ['Çay taze, demli ☕', 'Deniz manzaralı masa boş 🌊', 'Açık mı demli mi?']});
     continue;
   }
   if (i === center - 1 && j === center){ // MUHTARLIK
@@ -365,7 +367,7 @@ for (let i = 0; i < N; i++) for (let j = 0; j < N; j++){
     S.cyl(0.08, 0.1, 9, 6, 0xdddddd, cx + 9.5, 4.8, cz - 4); S.box(0.06, 1.6, 2.4, 0xe30a17, cx + 9.5, 8.4, cz - 2.8);
     for (const s of [-1, 1]) tree(S, cx - 8, cz + s * 8, 1);
     landmarks['Muhtarlık'] = [cx, cz]; label3d('Muhtarlık', cx + 2, 11.5, cz, '#2a2230');
-    npcSpots.push({name: 'Muhtar Nuri', x: cx + 9, z: cz + 2, r: 2.5, say: ['Mahallemize hoş geldin!', 'Takip eden herkese bir ev var 🏠', 'Evini bulamadın mı? Aramaya yaz!']});
+    npcSpots.push({name: 'Muhtar Nuri', x: cx + 8.2, z: cz - 2, path: [[cx + 8.2, cz - 2], [cx + 8.2, cz + 4]], say: ['Mahallemize hoş geldin!', 'Takip eden herkese bir ev var 🏠', 'Evini bulamadın mı? Aramaya yaz!']});
     continue;
   }
   if (i === center + 1 && j === center){ // PARK
@@ -395,7 +397,7 @@ S.box(3.4, 3, 3.4, 0xe24f4f, -40, 4.2, SEA_Z + 2); S.box(4, 0.3, 4, 0xffffff, -4
 for (let k = 0; k < 9; k++){ const x = -90 + k * 20 + rnd() * 6, z = SEA_Z + (rnd() - .5) * 8; if (Math.abs(x - 30) < 5) continue; S.cyl(0.05, 0.05, 2.4, 5, 0xffffff, x, 1.5, z); S.cyl(0, 1.6, 0.6, 8, pick([0xff8a2a, 0xe24f4f, 0x3f8fbf, 0xf4c542]), x, 2.9, z); G.box(1, 0.04, 2, pick([0xf3a0c0, 0x9fc6e8, 0xffd95a]), x + 1.4, 0.32, z); }
 for (const [x, z, c] of [[38, SEA_Z + 26, 0xffffff], [22, SEA_Z + 30, 0xe24f4f], [55, SEA_Z + 40, 0x3f8fbf]]){ S.box(2, 0.8, 5, c, x, 0.4, z); S.box(1.4, 0.9, 1.6, 0xf2efe6, x, 1.2, z - 0.6); }
 landmarks['Sahil'] = [0, SEA_Z]; label3d('Sahil', 0, 4, SEA_Z + 4, '#3f8fbf');
-npcSpots.push({name: 'Balıkçı Cemal', x: 30, z: SEA_Z + 28, r: 1.2, say: ['Bugün hamsi bol 🐟', 'Rastgele! 🎣', 'Deniz bugün çarşaf gibi']});
+npcSpots.push({name: 'Balıkçı Cemal', x: 30, z: SEA_Z + 22, path: [[30, SEA_Z + 20], [30, SEA_Z + 29.5]], say: ['Bugün hamsi bol 🐟', 'Rastgele! 🎣', 'Deniz bugün çarşaf gibi']});
 // cevre agaclari + tepeler
 for (let k = 0; k < 150; k++){ const a = rnd() * Math.PI * 2, r = HALF + 16 + rnd() * 70; const x = Math.cos(a) * r, z = Math.sin(a) * r; if (z < SEA_Z - 14) tree(S, x, z, 0.8 + rnd() * 0.7); }
 for (let k = 0; k < 9; k++) S.ico(40 + rnd() * 30, pick([0x8fb86e, 0x7faa62, 0x9cc27a]), -260 + k * 65, -10, -HALF - 120 - rnd() * 60, 0.45);
@@ -406,6 +408,69 @@ const lampMat = new THREE.MeshBasicMaterial({color: 0xfff1c0});
   pts.forEach(([x, z]) => { S.cyl(0.1, 0.14, 4.4, 6, 0x3a3540, x, 2.5, z); });
   const ih = new THREE.InstancedMesh(new THREE.SphereGeometry(0.35, 8, 6), lampMat, pts.length);
   const o = new THREE.Object3D(); pts.forEach(([x, z], i) => { o.position.set(x, 4.8, z); o.updateMatrix(); ih.setMatrixAt(i, o.matrix); }); scene.add(ih);
+}
+
+
+// ---------- ic mekanlar ----------
+const ROOMS = {};
+const BUILDINGS = [];
+function roomShell(x, z, w, d, wallC, floorC, lineC){
+  G.frame(x, z, 0); S.frame(x, z, 0); WL.frame(x, z, 0);
+  G.box(w + 1.4, 0.8, d + 1.4, 0x3a3340, 0, -0.4, 0);
+  G.box(w, 0.3, d, floorC, 0, 0.15, 0);
+  for (let k = -w / 2 + 1; k < w / 2; k += 1) G.box(0.05, 0.02, d, lineC, k, 0.31, 0);
+  S.box(w + 0.6, 3.4, 0.3, wallC, 0, 1.85, -d / 2 - 0.15);
+  for (const sd of [-1, 1]) S.box(0.3, 3.4, d + 0.3, wallC, sd * (w / 2 + 0.15), 1.85, -0.15);
+  S.box(w, 0.25, 0.06, 0x8a6347, 0, 0.42, -d / 2 + 0.03);
+  for (const u of [-w / 3, w / 3]){ S.pl(1.9, 1.4, TRIM, u, 2.3, -d / 2 + 0.01); WL.pl(1.6, 1.15, GLASS, u, 2.3, -d / 2 + 0.03); }
+  G.box(w + 0.6, 0.5, 0.3, 0x5a4f5e, 0, 0.25, d / 2 + 0.15);
+}
+function addTable(B, lx, lz, round, seats, col = 0xf2efe6){
+  if (round) B.cyl(0.75, 0.75, 0.08, 12, col, lx, 1.12, lz); else B.box(1.4, 0.08, 1.1, col, lx, 1.12, lz);
+  B.cyl(0.08, 0.1, 0.8, 6, 0x3a3540, lx, 0.7, lz);
+  for (const sd of [-1, 1]){
+    const cx2 = lx + sd * 1.05, ry = sd < 0 ? Math.PI / 2 : -Math.PI / 2;
+    B.box(0.55, 0.08, 0.55, 0x8a6347, cx2, 0.84, lz); B.box(0.45, 0.5, 0.45, 0x6e4f36, cx2, 0.55, lz);
+    B.box(0.06, 0.65, 0.55, 0x8a6347, cx2 + sd * 0.26, 1.18, lz);
+    seats.push({lx: cx2, lz, dir: ry});
+  }
+}
+function makeRoom(name, ox, oz, x, z, icon){
+  const R = {name, x, z, ox, oz, icon, seats: [], w: 14, d: 10}; ROOMS[name] = R; BUILDINGS.push(R); return R;
+}
+{ // FIRIN
+  const R = makeRoom('Fırın', -6 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], -40, -700, '🥖'), B = S;
+  roomShell(R.x, R.z, R.w, R.d, 0xf4e3c6, 0xc9a27a, 0xb08a62);
+  B.box(7, 1.1, 0.9, 0x9a6a46, -1, 0.85, -2.6); B.box(7.2, 0.1, 1.05, 0xe8dcc8, -1, 1.45, -2.6); B.box(6, 0.55, 0.7, 0xcfe6ee, -1, 1.78, -2.6);
+  for (let k = 0; k < 9; k++) B.ico(0.22, pick([0xc68a4a, 0xd9a35f, 0xb5763a]), -3.6 + k * 0.65, 1.7, -2.6, 0.6);
+  for (const y of [1.5, 2.4]){ B.box(9, 0.12, 0.6, 0x8a6347, -1.5, y, -4.6); for (let k = 0; k < 12; k++) B.ico(0.28, pick([0xc68a4a, 0xd9a35f, 0xb5763a, 0xe0b878]), -5.6 + k * 0.72, y + 0.25, -4.6, 0.55); }
+  B.box(2.6, 2.8, 1.6, 0xa0523a, 5.2, 1.7, -3.9); B.pl(1.3, 0.85, 0x2a1a14, 5.2, 1.3, -3.08); WL.pl(1.0, 0.6, 0xff8a2a, 5.2, 1.3, -3.06); B.box(0.5, 1.6, 0.5, 0x8a4535, 5.8, 3.6, -4.2);
+  for (const [tx, tz] of [[-4.5, 1.6], [0, 2.8], [4.5, 1.6]]) addTable(B, tx, tz, true, R.seats);
+  for (const [bx, bz] of [[-6.4, -4.2], [6.4, 4.2], [-6.4, 4.2]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
+  S.reset(); G.reset(); WL.reset();
+  R.keeper = {name: 'Fırıncı Hasan', path: [[-4, -3.7], [2.5, -3.7]], say: ['Taze ekmek çıktı! 🍞', 'Sıcak poğaça var 🥐', 'Hoş geldin, ne alırsın?']};
+  R.guests = [{name: 'Selma Teyze', seat: 0, say: ['Poğaçalar sıcacık 🥐', 'Bu fırının ekmeği başka', 'Çayım soğumasın']}, {name: 'Öğrenci Efe', seat: 3, say: ['Sınavdan önce simit şart 📚', 'Bir açma daha alayım', 'Wifi şifresi ne abi? 😅']}];
+}
+{ // KAHVEHANE
+  const R = makeRoom('Kahvehane', 6.5 + blockCenter(3, 2)[0], 4 + blockCenter(3, 2)[1], -10, -700, '☕'), B = S;
+  roomShell(R.x, R.z, R.w, R.d, 0xdfe8cf, 0xd9cbb0, 0xc2b394);
+  B.box(4.2, 1.1, 0.9, 0x6e4f36, 4.3, 0.85, -3.4); B.box(4.4, 0.1, 1.05, 0xe8dcc8, 4.3, 1.45, -3.4);
+  B.cyl(0.35, 0.42, 0.9, 10, 0xc9ccd2, 3.1, 1.95, -3.4); B.cyl(0.15, 0.3, 0.35, 10, 0xc9ccd2, 3.1, 2.55, -3.4);
+  for (let k = 0; k < 5; k++) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, 4.1 + k * 0.32, 1.6, -3.2);
+  B.box(2.4, 1.4, 0.12, 0x1a1a1f, -3, 2.5, -4.88); WL.pl(2.2, 1.2, 0x3f8fbf, -3, 2.5, -4.8);
+  B.box(1.6, 1.1, 0.06, 0xe30a17, 0, 2.5, -4.97);
+  for (const [tx, tz] of [[-4.2, 0.2], [0.4, 2.6], [4, 0.8]]) addTable(B, tx, tz, false, R.seats, 0xf0ece0);
+  for (const [tx, tz] of [[-4.2, 0.2], [4, 0.8]]){ B.box(0.8, 0.06, 0.5, 0x7a4a2a, tx, 1.19, tz); B.box(0.7, 0.02, 0.4, 0xe8d2a0, tx, 1.23, tz); }
+  for (const [tx, tz] of [[0.4, 2.6], [-4.2, 0.2]]) for (const sd of [-0.35, 0.35]) B.cyl(0.07, 0.06, 0.18, 8, 0xb5452a, tx + sd, 1.25, tz + 0.35);
+  for (const [bx, bz] of [[-6.4, -4.2], [6.4, 4.2]]){ B.cyl(0.35, 0.28, 0.6, 8, 0xc1704a, bx, 0.6, bz); bush(B, bx, bz, 0.55); }
+  S.reset(); G.reset(); WL.reset();
+  R.keeper = {name: 'Kahveci Rıza', path: [[2.6, -4.3], [6.2, -4.3]], say: ['Çaylar geliyor ☕', 'Orta şekerli kahve?', 'Otur, yorgunluk çayı benden']};
+  R.guests = [{name: 'Necati Amca', seat: 0, say: ['Hamle sende Ziya! 🎲', 'Şeş beş!', 'Rıza, iki çay!']}, {name: 'Ziya Amca', seat: 1, say: ['Dur, düşünüyorum…', 'Mars oldun Necati! 😄', 'Bu oyun bende']}, {name: 'Bahar Abla', seat: 4, say: ['Burası mahallenin kalbi', 'Çay tavşan kanı ☕', 'Maç kaçta başlıyor?']}];
+}
+for (const R of Object.values(ROOMS)){
+  R.seats.forEach(st => { st.x = R.x + st.lx; st.z = R.z + st.lz; st.y = 0.88; });
+  npcSpots.push({...R.keeper, room: R.name, x: R.x + R.keeper.path[0][0], z: R.z + R.keeper.path[0][1], path: R.keeper.path.map(([a, b]) => [R.x + a, R.z + b])});
+  R.guests.forEach(g => npcSpots.push({name: g.name, say: g.say, room: R.name, sit: R.seats[g.seat], x: R.seats[g.seat].x, z: R.seats[g.seat].z}));
 }
 
 // ---------- tabelalar (bos arsalar) ----------
@@ -441,6 +506,7 @@ function makeParts(C){
     head: mergeGeometries([vc(BX(.46, .48, .44), 0xffffff, 0, .25, 0), vc(BX(.075, .085, .03), 0x1a1a1a, -.1, .29, .225), vc(BX(.075, .085, .03), 0x1a1a1a, .1, .29, .225), vc(BX(.14, .035, .03), 0x7a3a3a, 0, .13, .225), vc(BX(.1, .06, .03), 0xd99a8a, -.17, .19, .224), vc(BX(.1, .06, .03), 0xd99a8a, .17, .19, .224)]),
     hairS: mergeGeometries([vc(BX(.5, .15, .48), 0xffffff, 0, .52, 0), vc(BX(.5, .34, .1), 0xffffff, 0, .36, -.21), vc(BX(.5, .1, .08), 0xffffff, 0, .45, .21)]),
     hairL: mergeGeometries([vc(BX(.52, .16, .5), 0xffffff, 0, .52, 0), vc(BX(.52, .7, .12), 0xffffff, 0, .18, -.22), vc(BX(.08, .5, .36), 0xffffff, -.26, .28, -.04), vc(BX(.08, .5, .36), 0xffffff, .26, .28, -.04), vc(BX(.5, .1, .08), 0xffffff, 0, .45, .22)]),
+    cape: mergeGeometries([vc(BX(.74, 1.25, .04), 0xffffff, 0, -.62, 0), vc(BX(.6, .1, .12), 0xd4a63a, 0, 0, .02)]),
     cap: mergeGeometries([vc(new THREE.CylinderGeometry(.27, .27, .18, 10), 0xffffff, 0, .56, 0), vc(BX(.38, .04, .24), 0xffffff, 0, .48, .3)]),
   };
   const mat = new THREE.MeshLambertMaterial({vertexColors: true});
@@ -453,14 +519,14 @@ function makeParts(C){
 }
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 const R0 = new THREE.Object3D(), D = {};
-for (const k of ['legL', 'legR', 'armL', 'armR', 'torso', 'head']){ D[k] = new THREE.Object3D(); R0.add(D[k]); }
-D.legL.position.set(-.14, .78, 0); D.legR.position.set(.14, .78, 0); D.torso.position.set(0, .78, 0); D.armL.position.set(-.44, 1.45, 0); D.armR.position.set(.44, 1.45, 0); D.head.position.set(0, 1.5, 0);
+for (const k of ['legL', 'legR', 'armL', 'armR', 'torso', 'head', 'cape']){ D[k] = new THREE.Object3D(); R0.add(D[k]); }
+D.legL.position.set(-.14, .78, 0); D.legR.position.set(.14, .78, 0); D.torso.position.set(0, .78, 0); D.armL.position.set(-.44, 1.45, 0); D.armR.position.set(.44, 1.45, 0); D.head.position.set(0, 1.5, 0); D.cape.position.set(0, 1.47, -0.2);
 function setLook(i, look){
   const P = people.parts, c = new THREE.Color();
   const sc = (m, j, h) => m.setColorAt(j, c.set(h));
   sc(P.leg, i * 2, look.pants); sc(P.leg, i * 2 + 1, look.pants); sc(P.arm, i * 2, look.shirt); sc(P.arm, i * 2 + 1, look.shirt);
   sc(P.hand, i * 2, look.skin); sc(P.hand, i * 2 + 1, look.skin); sc(P.torso, i, look.shirt); sc(P.skirt, i, look.skirtC); sc(P.head, i, look.skin);
-  sc(P.hairS, i, look.hair); sc(P.hairL, i, look.hair); sc(P.cap, i, look.capC);
+  sc(P.hairS, i, look.hair); sc(P.hairL, i, look.hair); sc(P.cap, i, look.capC); sc(P.cape, i, 0x8b1e2d);
 }
 function makeLook(r){
   const f = r() < 0.5;
@@ -470,23 +536,26 @@ function makeLook(r){
 const labels = new Map();
 function makeLabel(p){
   if (labels.has(p.key)) return labels.get(p.key);
-  const s = p.npc ? label3d(p.name, 0, -99, 0, 'rgba(42,34,48,.88)', '#fff', 0.7) : label3d('@' + p.r.u, 0, -99, 0, 'rgba(251,247,239,.95)', '#2a2230', 0.75);
+  const s = p.npc ? label3d(p.name, 0, -99, 0, 'rgba(42,34,48,.88)', '#fff', 0.7) : p.founder ? label3d('★ @' + p.r.u, 0, -99, 0, 'rgba(42,34,48,.92)', '#ffd56a', 0.8) : label3d('@' + p.r.u, 0, -99, 0, 'rgba(251,247,239,.95)', '#2a2230', 0.75);
   s.visible = false; labels.set(p.key, s); return s;
 }
 const lw = (L, lx, lz) => [L.x + lx * Math.cos(L.ry) + lz * Math.sin(L.ry), L.z - lx * Math.sin(L.ry) + lz * Math.cos(L.ry)];
 function newTarget(p){
-  if (p.npc){ const a = Math.random() * Math.PI * 2, rr = Math.random() * p.rad; p.tgt.set(p.home.x + Math.cos(a) * rr, 0, p.home.z + Math.sin(a) * rr); return; }
-  const L = p.r.lot, k = Math.random();
-  const [x, z] = k < 0.25 ? lw(L, p.dx + (Math.random() - .5) * 1.4, FZ - 1.2) : lw(L, (Math.random() - .5) * 22, WALKZ + (Math.random() - .5) * 0.5);
-  p.tgt.set(x, 0, z);
+  if (p.sit) return;
+  if (p.npc){ if (!p.path) return; p.pi = ((p.pi || 0) + 1) % p.path.length; p.tgt.set(p.path[p.pi][0], 0, p.path[p.pi][1]); return; }
+  if (!p.q || !p.q.length){
+    const L = p.r.lot, P2 = (lx, lz, g) => { const [x, z] = lw(L, lx, lz); return {x, z, g}; };
+    if (p.inG) p.q = [P2(p.dx, FZ - 1.2, true), P2(p.dx, WALKZ, false), P2((Math.random() - .5) * 22, WALKZ, false)];
+    else if (Math.random() < 0.25) p.q = [P2(p.dx, WALKZ, false), P2(p.dx + (Math.random() - .5) * 1.2, FZ - 1.2, true)];
+    else p.q = [P2((Math.random() - .5) * 22, WALKZ, false)];
+  }
+  const t = p.q.shift(); p.tgt.set(t.x, 0, t.z); p.tg = t.g;
 }
 async function loadResidents(){
   residents = (await residentsP).map((r, i) => ({...r, u: norm(r.u), idx: i}));
   residents.forEach((r, i) => { r.lot = lots[i % lots.length]; if (i < lots.length) r.lot.owner = i; });
   const n = residents.length;
   $('pop').textContent = n.toLocaleString('tr-TR');
-  const pct = Math.min(100, n / GOAL * 100); $('goalbar').style.width = Math.max(3, pct) + '%';
-  $('goaltxt').textContent = `Ev sahipliği ${GOAL} takipçide açılıyor · ${n}/${GOAL}`;
   // evler + bos arsalar
   const signs = [];
   lots.forEach(L => {
@@ -511,13 +580,14 @@ async function loadResidents(){
   people.parts = makeParts(Math.max(1, C));
   residents.forEach((r, i) => {
     const look = makeLook(RNG(hashStr(r.u)));
+    if (r.u === 'bizimsokak.tr') Object.assign(look, {hair: 0x2b2118, shirt: 0x2f3a52, pants: 0x23232a, hairStyle: 'S', cap: false, skirt: false, s: 1.12});
     const [hx, hz] = lw(r.lot, r.lot.h ? r.lot.h.dx : 0, WALKZ);
-    const p = {key: 'u:' + r.u, r, look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
+    const p = {key: 'u:' + r.u, r, founder: r.u === 'bizimsokak.tr', look, s: look.s, dx: r.lot.h ? r.lot.h.dx : 0, home: new THREE.Vector3(hx, 0, hz), pos: new THREE.Vector3(hx + (Math.random() - .5) * 4, 0, hz), tgt: new THREE.Vector3(), speed: 1.3 + Math.random() * 0.6, wait: Math.random() * 3, ph: Math.random() * 6, dir: r.lot.ry, jump: 0, wave: 0};
     newTarget(p); people.list.push(p); setLook(i, look);
   });
   npcSpots.forEach((s, k) => {
     const look = makeLook(RNG(hashStr(s.name))), i = n + k;
-    const p = {key: 'n:' + s.name, npc: true, name: s.name, say: s.say, rad: s.r, look, s: look.s, home: new THREE.Vector3(s.x, 0, s.z), pos: new THREE.Vector3(s.x, 0, s.z), tgt: new THREE.Vector3(), speed: 1.1, wait: Math.random() * 3, ph: 0, dir: 0, jump: 0, wave: 0};
+    const p = {key: 'n:' + s.name, npc: true, name: s.name, say: s.say, path: s.path, pi: 0, room: s.room, sit: s.sit, look, s: look.s, home: new THREE.Vector3(s.x, 0, s.z), pos: new THREE.Vector3(s.x, 0, s.z), tgt: new THREE.Vector3(s.x, 0, s.z), speed: 1.1, wait: Math.random() * 3, ph: 0, dir: s.sit ? s.sit.dir : 0, jump: 0, wave: 0};
     newTarget(p); people.list.push(p); setLook(i, look);
   });
   for (const k in people.parts) people.parts[k].count = k === 'leg' || k === 'arm' || k === 'hand' ? C * 2 : C;
@@ -534,10 +604,11 @@ function updatePeople(dt, now){
     const p = L[i];
     const far = p.pos.distanceToSquared(tg) > 150 * 150 && !p.hl;
     // hareket
-    if (p.wait > 0){ p.wait -= dt; p.moving = false; }
+    if (p.sit){ p.moving = false; if (p.wait > 0) p.wait -= dt; }
+    else if (p.wait > 0){ p.wait -= dt; p.moving = false; }
     else {
       const dx = p.tgt.x - p.pos.x, dz = p.tgt.z - p.pos.z, len = Math.hypot(dx, dz);
-      if (len < 0.15){ p.wait = 1.5 + Math.random() * 5; p.moving = false; newTarget(p); }
+      if (len < 0.15){ p.inG = p.tg; p.wait = (p.q && p.q.length) ? 0.05 : 1.5 + Math.random() * 5; p.moving = false; newTarget(p); }
       else {
         const st = Math.min(len, p.speed * dt); p.pos.x += dx / len * st; p.pos.z += dz / len * st; p.ph += st * 3.4; p.moving = true;
         let da = Math.atan2(dx, dz) - p.dir; da = Math.atan2(Math.sin(da), Math.cos(da)); p.dir += da * Math.min(1, dt * 8);
@@ -547,10 +618,17 @@ function updatePeople(dt, now){
     // poz
     let jy = 0; if (p.jump > 0){ p.jump = Math.max(0, p.jump - dt); jy = Math.sin((1 - p.jump / 0.55) * Math.PI) * 0.9; }
     const sw = p.moving ? Math.sin(p.ph) * 0.6 : 0, sc = p.s * (p.hl ? 1.2 : 1);
+    if (p.sit){
+      R0.position.set(p.sit.x, p.sit.y - 0.78 * sc + jy, p.sit.z); R0.rotation.set(0, p.jump > 0 || p.wave > 0 ? p.dir : p.sit.dir, 0); R0.scale.setScalar(sc);
+      D.legL.rotation.x = -1.45; D.legR.rotation.x = -1.45;
+      const ph2 = (t * 0.5 + i * 1.3) % 7; D.armL.rotation.set(-0.45, 0, -0.05); D.armR.rotation.set(ph2 < 1.4 ? -1.95 : -0.45, 0, 0.05);
+    } else {
     R0.position.set(p.pos.x, 0.3 + jy + (p.moving ? Math.abs(Math.sin(p.ph)) * 0.05 : Math.sin(t * 2 + i) * 0.01), p.pos.z);
     R0.rotation.set(0, p.dir, 0); R0.scale.setScalar(sc);
     D.legL.rotation.x = sw; D.legR.rotation.x = -sw;
     D.armL.rotation.set(-sw * 0.8, 0, -0.07); D.armR.rotation.set(sw * 0.8, 0, 0.07);
+    }
+    D.cape.rotation.x = 0.12 + (p.moving ? 0.32 + Math.sin(p.ph * 2) * 0.07 : Math.sin(t * 1.4 + i) * 0.04) + (p.jump > 0 ? 0.5 : 0) + (p.sit ? 0.25 : 0);
     if (p.jump > 0){ D.armL.rotation.z = -1.0; D.armR.rotation.z = 1.0; D.legL.rotation.x = 0.4; D.legR.rotation.x = -0.4; }
     if (p.wave > 0){ p.wave -= dt; D.armR.rotation.set(0, 0, 2.6 + Math.sin(t * 15) * 0.35); }
     D.head.rotation.set(0, p.moving ? 0 : Math.sin(t * 0.7 + i * 1.7) * 0.35, 0);
@@ -560,11 +638,12 @@ function updatePeople(dt, now){
     P.hand.setMatrixAt(i * 2, D.armL.matrixWorld); P.hand.setMatrixAt(i * 2 + 1, D.armR.matrixWorld);
     P.torso.setMatrixAt(i, D.torso.matrixWorld); P.head.setMatrixAt(i, D.head.matrixWorld);
     P.skirt.setMatrixAt(i, p.look.skirt ? D.torso.matrixWorld : ZERO);
-    P.hairS.setMatrixAt(i, p.look.hairStyle === 'S' && !p.look.cap ? D.head.matrixWorld : ZERO);
+    P.hairS.setMatrixAt(i, (p.look.hairStyle === 'S' && (!p.look.cap || p.founder)) || (p.founder && p.look.hairStyle === '-') ? D.head.matrixWorld : ZERO);
     P.hairL.setMatrixAt(i, p.look.hairStyle === 'L' ? D.head.matrixWorld : ZERO);
-    P.cap.setMatrixAt(i, p.look.cap ? D.head.matrixWorld : ZERO);
-    _m.compose(_v.set(p.pos.x, 0.37, p.pos.z), _q.identity(), _s.setScalar(sc * (1 - jy * 0.4))); P.shadow.setMatrixAt(i, _m);
-    p.top = 0.3 + jy + 2.25 * sc;
+    P.cap.setMatrixAt(i, p.look.cap && !p.founder ? D.head.matrixWorld : ZERO);
+    P.cape.setMatrixAt(i, p.founder ? D.cape.matrixWorld : ZERO);
+    _m.compose(_v.set(p.sit ? p.sit.x : p.pos.x, 0.37, p.sit ? p.sit.z : p.pos.z), _q.identity(), _s.setScalar(sc * (1 - jy * 0.4))); P.shadow.setMatrixAt(i, _m);
+    p.top = (p.sit ? p.sit.y - 0.78 * sc : 0.3) + jy + 2.25 * sc; if (p.sit){ p.pos.x = p.sit.x; p.pos.z = p.sit.z; }
     if (p.bub){ p.bub.t -= dt; p.bub.s.position.set(p.pos.x, p.top + 2.3, p.pos.z); p.bub.s.material.opacity = Math.min(1, p.bub.t * 2); if (p.bub.t <= 0){ scene.remove(p.bub.s); p.bub.s.material.map.dispose(); p.bub.s.material.dispose(); p.bub = null; } }
     if (p.hl){ ring.visible = true; ring.position.set(p.pos.x, 0.4, p.pos.z); ring.scale.setScalar(1 + Math.sin(t * 5) * 0.12); }
   }
@@ -613,6 +692,8 @@ function tap(x, y){
   let best = -1, bd = 46 * 46;
   people.list.forEach((p, i) => { for (const h of [0.9, 1.9]){ const s = scr(p.pos.x, h * p.s, p.pos.z); if (!s) continue; const d = (s[0] - x) ** 2 + (s[1] - y) ** 2; if (d < bd){ bd = d; best = i; } } });
   if (best >= 0){ react(best); return; }
+  if (!inside){ let bb = null, bd2 = 80 * 80; BUILDINGS.forEach(b => { const s2 = scr(b.ox, 3, b.oz); if (!s2) return; const d = (s2[0] - x) ** 2 + (s2[1] - y) ** 2; if (d < bd2){ bd2 = d; bb = b; } }); if (bb){ showBuilding(bb.name); return; } }
+  if (inside) return;
   let lb = null; bd = 70 * 70;
   lots.forEach(L => { const s = scr(L.x, 2.5, L.z); if (!s) return; const d = (s[0] - x) ** 2 + (s[1] - y) ** 2; if (d < bd){ bd = d; lb = L; } });
   if (lb && lb.owner !== undefined && lb.owner < residents.length){ const i = people.list.findIndex(p => p.r && p.r.idx === lb.owner); react(i); return; }
@@ -638,10 +719,48 @@ function updateSky(){
   winLit.emissive.setRGB(1.0, 0.72, 0.38).multiplyScalar(Math.max(0, nightK - 0.3) * 1.2);
   winDark.emissive.setRGB(0.1, 0.12, 0.2).multiplyScalar(nightK);
   renderer.shadowMap.needsUpdate = true;
+  if (inside){ scene.background = new THREE.Color(0x2b2533); scene.fog.color.set(0x2b2533); hemi.intensity = 1.15; sun.intensity = 1.5; }
 }
 
 // ---------- kamera hareketleri ----------
 let fly = null;
+// ---------- ic mekan: gir / cik ----------
+let inside = null, chatT = 0;
+const roomPeople = name => people.list.filter(p => p.room === name);
+const getMe = () => { try { return localStorage.getItem('bs_me') || ''; } catch(e){ return ''; } };
+function showBuilding(name){
+  const R = ROOMS[name], occ = roomPeople(name);
+  $('cardbody').innerHTML = `<h2>${R.icon} ${name}</h2><p>İçeride <b>${occ.length} kişi</b> var: ${occ.map(p => p.npc ? p.name : '@' + p.r.u).join(', ')}</p>
+  <div class="row"><button class="pri btn" id="enter">İçeri gir 🚪</button></div>`;
+  $('enter').onclick = () => enterRoom(name);
+  $('card').classList.add('show');
+}
+function flyToPos(pos, tgt, ms = 1500){ fly = {from: {p: camera.position.clone(), t: controls.target.clone()}, to: {p: pos, t: tgt}, t0: performance.now(), ms}; }
+function enterRoom(name){
+  const R = ROOMS[name]; inside = name; $('card').classList.remove('show');
+  const me = getMe(), mi = people.list.findIndex(p => p.r && p.r.u === me);
+  if (mi >= 0){
+    const p = people.list[mi], taken = new Set(people.list.filter(q => q.sit).map(q => q.sit)), seat = R.seats.find(st => !taken.has(st));
+    if (seat){ p.prevPos = p.pos.clone(); p.sit = seat; p.room = name; p.dir = seat.dir; p.q = []; p.jump = 0.55; toast(`@${me} içeri girdi`); }
+  }
+  const hf = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect), dd = Math.max(20, (R.w / 2 + 1.2) / Math.tan(hf / 2));
+  flyToPos(new THREE.Vector3(R.x, dd * 0.82, R.z + dd * 0.55), new THREE.Vector3(R.x, 0, R.z));
+  $('intitle').textContent = `${R.icon} ${name} · ${roomPeople(name).length} kişi`; $('inbar').classList.add('show');
+  updateSky();
+}
+function exitRoom(){
+  if (!inside) return; const R = ROOMS[inside];
+  people.list.forEach(p => { if (!p.npc && p.room === inside){ p.sit = null; p.room = null; p.pos.copy(p.home); p.tgt.copy(p.home); p.inG = false; p.q = []; } });
+  inside = null; $('inbar').classList.remove('show'); updateSky();
+  camera.position.set(R.ox + 20, 24, R.oz + 34); controls.target.set(R.ox, 0, R.oz); flyTo(R.ox, R.oz, 28, 20, 900);
+}
+$('exitbtn').onclick = exitRoom;
+function roomChatter(dt){
+  if (!inside || (chatT += dt) < 3.2) return; chatT = 0;
+  const occ = roomPeople(inside).filter(p => !p.bub); if (!occ.length) return;
+  const p = pick(occ, Math.random); bubble(p, p.npc ? pick(p.say, Math.random) : pick(HELLO, Math.random));
+}
+
 function flyTo(x, z, dist = 34, h = 26, ms = 1600, ang = 0){
   const from = {p: camera.position.clone(), t: controls.target.clone()};
   const ox = dist * 0.55, oz = dist, c = Math.cos(ang), sn = Math.sin(ang);
@@ -676,10 +795,11 @@ function showCard(p, q){
     <div class="row"><a class="pri" href="${IG}" target="_blank" rel="noopener">Instagram'a git</a></div>`;
   } else {
     const r = p.r; const no = r.idx + 1;
-    b.innerHTML = `<h2>@${r.u}</h2><p>${no}. komşu · ${r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Bizim Sokak sakini'}</p>
+    b.innerHTML = `<h2>${p.founder ? '★ ' : ''}@${r.u}</h2><p>${p.founder ? 'Kurucu · Bizim Sokak\'ın yapımcısı' : no + '. komşu · ' + (r.t ? new Date(r.t).toLocaleDateString('tr-TR') + ' tarihinde taşındı' : 'Bizim Sokak sakini')}</p>
     <div class="locks"><div>Evini süsle</div><div>Bahçe ekle</div><div>Kapıyı çal</div><div>Altın topla</div></div>
-    <p style="font-size:12px">Ev sahipliği ${GOAL} takipçide açılıyor. Takibi bırakanın evi boşaltılır.</p>
-    <div class="row"><button class="pri btn" id="share">Evimi paylaş</button><a class="sec" href="${IG}" target="_blank" rel="noopener">Takip et</a></div>`;
+    <p style="font-size:12px">Yakında: evini süsle, kapı çal, bildirim al. Takibi bırakanın evi boşaltılır.</p>
+    <div class="row"><button class="pri btn" id="share">Evimi paylaş</button><button class="sec btn" id="itsme">${getMe() === r.u ? 'Sen ✓' : 'Bu benim'}</button></div>`;
+    $('itsme').onclick = () => { try { localStorage.setItem('bs_me', r.u); } catch(e){} $('itsme').textContent = 'Sen ✓'; toast('Tamam! Fırına, kahvehaneye girince karakterin de seninle gelir'); };
     $('share').onclick = async () => {
       const url = location.origin + location.pathname + '?u=' + encodeURIComponent(r.u);
       const data = {title: 'Bizim Sokak', text: `Bak, Bizim Sokak'ta benim de evim var: @${r.u}`, url};
@@ -699,7 +819,7 @@ function buildMenu(){
 }
 
 // ---------- sinema modu (video cekimi icin) ----------
-window.cine = { flyTo, findUser, react, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
+window.cine = { flyTo, findUser, react, enterRoom, exitRoom, showBuilding, scene, camera, controls, people, setPos(px, py, pz, tx, ty, tz){ camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); } };
 
 // ---------- dongu ----------
 function resize(){ const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.8 ? 48 : 38; camera.updateProjectionMatrix(); }
@@ -713,6 +833,7 @@ function loop(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   updateFly(); controls.update(); updatePeople(dt, now);
   if ((lblT += dt) > 0.25){ lblT = 0; updateLabels(); }
+  roomChatter(dt);
   renderer.render(scene, camera); requestAnimationFrame(loop);
   // yavas cihazda cozunurlugu otomatik dusur
   if (!CINE){ fpsN++; fpsT += dt; if (fpsT > 2.5){ const fps = fpsN / fpsT; fpsN = 0; fpsT = 0; if (fps < 32 && PR > 1){ PR = Math.max(1, PR - 0.25); renderer.setPixelRatio(PR); resize(); } } }
